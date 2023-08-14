@@ -11,7 +11,9 @@ import "../../lib/openzeppelin-contracts/contracts/token/ERC721/extensions/ERC72
 
 contract Voting is ERC721, ERC721URIStorage {
     event NewCandidate(address addr, string position);
+    event RmCandidate(address addr, );
     event Verified(address _voter, uint256 vn);
+
 
     struct Voter {
         uint256 _ID;
@@ -132,10 +134,13 @@ contract Voting is ERC721, ERC721URIStorage {
             uint256 lastIndex = candidates.length - 1;
             uint256 lastId = candidates[lastIndex];
 
-            
+            uint256 exId = candidates[IndexCandidate];
+            candidates[IndexCandidate] = lastIndex;
+            candidates.pop();
         }
 
         return candidates;
+        emit RmCandidate(addr, candidate._post);
     }
 
     function retIndexOfCandidate(address addr) internal returns (uint256) {
