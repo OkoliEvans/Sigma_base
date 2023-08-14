@@ -11,9 +11,9 @@ import "../../lib/openzeppelin-contracts/contracts/token/ERC721/extensions/ERC72
 
 contract Voting is ERC721, ERC721URIStorage {
     event NewCandidate(address addr, string position);
-    event RmCandidate(address addr, );
+    event RmCandidate(address addr, string position);
     event Verified(address _voter, uint256 vn);
-
+    event Voted(address voter, address candidate);
 
     struct Voter {
         uint256 _ID;
@@ -42,22 +42,26 @@ contract Voting is ERC721, ERC721URIStorage {
         string contest;
         string tokenURI;
         string baseUri;
+        bool started;
     }
     // initialize structs
-    Voter public voter;
-    Candidate public candidate;
+    // Voter public voter;
+    // Candidate public candidate;
     Election public election;
 
+    // state variables
     address public GModerator;
     address public overseer;
 
+    mapping(address _candidate => Candidate) candidate;
+    mapping(address _voter => Voter) public voters;
     Candidate[] public candidates;
 
     constructor(
         string memory name,
         string memory symbol,
-        string calldata tokenUri,
-        string calldata tElection,
+        string memory tokenUri,
+        string memory tElection,
         uint256 voteId,
         uint256 start,
         uint256 end,
@@ -89,8 +93,10 @@ contract Voting is ERC721, ERC721URIStorage {
         string calldata desc
     ) external onlyAdmin {
         if (addr == address(0)) revert("addCandidate: Address_0");
-        if (candidate._address == addr) revert("addCandidate: Already added");
-        if (id == 0 || id == candidate._ID) revert("addCAndidate: Invalid ID");
+        if (candidate[addr]._address == addr)
+            revert("addCandidate: Already added");
+        if (id == 0 || id == candidate[addr]._ID)
+            revert("addCAndidate: Invalid ID");
         if (age == 0) revert("addCandidate: Invalid age");
         bytes32 nullHash = keccak256(abi.encode(""));
         bytes32 nameHash = keccak256(abi.encode(fullName));
@@ -98,13 +104,13 @@ contract Voting is ERC721, ERC721URIStorage {
         if (nameHash == nullHash || descHsh == nullHash)
             revert("addCandidate: Invalid name or desc");
 
-        candidate.ID = id;
-        candidate._age = age;
-        candidate._address = addr;
-        candidate._fullName = fullName;
-        candidate._post = post;
-        candidate._desc = desc;
-        candidate._isEligible = true;
+        candidate[addr]._ID = id;
+        candidate[addr]._age = age;
+        candidate[addr]._address = addr;
+        candidate[addr]._fullName = fullName;
+        candidate[addr]._post = post;
+        candidate[addr]._desc = desc;
+        candidate[addr]._isEligible = true;
 
         candidates.push(
             Candidate({
@@ -124,91 +130,84 @@ contract Voting is ERC721, ERC721URIStorage {
 
     function rmCandidate(
         address addr
-    ) external onlyAdmin returns (candidates[] memory) {
-        if (!candidate._isEligible) revert("rmCandidate: Candidate not found");
+    ) external onlyAdmin returns (Candidate[] memory) {
+        if (!candidate[addr]._isEligible)
+            revert("rmCandidate: Candidate already disqualified");
 
-        if (candidate._address == addr) {
-            candidate._isEligible = false;
-            /// TODO >> del candidate from array
+        if (addr == candidate[addr]._address) {
+            candidate[addr]._isEligible = false;
+
+            /// delete from candidates array
             uint256 IndexCandidate = retIndexOfCandidate(addr);
             uint256 lastIndex = candidates.length - 1;
-            uint256 lastId = candidates[lastIndex];
+            // uint256 lastId = candidates[lastIndex];
 
             uint256 exId = candidates[IndexCandidate];
-            candidates[IndexCandidate] = lastIndex;
+            candidates[exId] = lastIndex;
             candidates.pop();
         }
 
         return candidates;
-        emit RmCandidate(addr, candidate._post);
-    }
-
-    function retIndexOfCandidate(address addr) internal returns (uint256) {
-        if(!addr == candidate._address) revert("retIndexOfCandidate: Candidate not found");
-        for (uint i = 0; i < candidates.length; i++) {
-            if (addr == candidate._address) {
-                uint256 indexOfCandidate = candidates[addr].index;
-                return indexOfCandidate;
-            }
-        }
+        emit RmCandidate(addr, candidate[addr]._post);
     }
 
     function verify(uint256 vn) external {
         address voter_ = msg.sender;
-        if (voter._isVerified) revert("verify: Double reg.");
+        if (voters[voter_]._isVerified) revert("verify: Double reg.");
         bytes32 vnHash = keccak256(abi.encode(vn));
-        bytes32 verifiedVnHash = voter._hashVn;
+        bytes32 verifiedVnHash = voters[voter_]._hashVn;
         if (vnHash == verifiedVnHash) revert("verify: VN in database");
 
+        string memory uri_ = election.tokenURI;
         uint256 tokenId = election.tokenId;
         tokenId = tokenId + 1;
-        string memory _uri = election.tokenURI;
-        voter._isVerified = true;
-        _safeMint2(voter_, tokenId, _uri);
+
+        voters[voter_]._ID = vn;
+        voters[voter_]._hashVn = vnHash;
+        voters[voter_]._address = msg.sender;
+        voters[voter_]._isVerified = true;
+        _safeMint2(voter_, tokenId, uri_);
         emit Verified(msg.sender, vn);
     }
 
-    function startVote(uint256 voteId) external onlyAdmin {
-        if (!_isIdUsed[voteId]) revert("start: Invalid voteID");
-        if (contests._started) revert("start: Voting already in session");
-        if (block.timestamp < contests._startT) revert("start: not startTime");
-
-        contests._started = true;
+    ///@notice Returns details of a particular voter
+    function retVoter(address addrVoter) external view returns (Voter memory) {
+        return voters[addrVoter];
     }
 
-    function endVote(uint256 voteId) external onlyAdmin {
-        if (!_isIdUsed[voteId]) revert("end: Invalid voteID");
-        if (!contests._started) revert("end: Voting not in session");
-        if (contests._endT < contests._startT) revert("end: not endTime");
+    function startVote() external onlyAdmin {
+        if (candidates.length <= 0)
+            revert("startVote: No registered candidates");
+        if (election.started) revert("start: Voting already in session");
+        if (block.timestamp < election.startT) revert("start: not startTime");
 
-        contests._started = false;
+        election.started = true;
     }
 
-    function vote(uint64 voteId, address candidate) external {
-        if (!_isIdUsed[voteId]) revert("vote: Invalid voteID");
-        if (!contests._voters._isVerified) revert("vote: Not verified");
-        if (contests._voters._voted) revert("vote: Voted");
+    function endVote() external onlyAdmin {
+        if (!election.started) revert("end: Voting not in session");
+        if (election.endT < election.startT) revert("end: not endTime");
 
-        address voter = contests._voters._address;
-        if (msg.sender != voter) revert("vote: No record");
-        if (candidate != contests._candidates._address)
-            revert("vote: Candidate not found");
-        if (!contests._candidates._isEligible)
+        election.started = false;
+    }
+
+    function vote(uint64 voteId, address addrCandidate) external {
+        address voter_ = msg.sender;
+        if (!voters[voter_]._isVerified) revert("vote: Not verified");
+        if (voters[voter_]._voted) revert("vote: Voted");
+        if (!candidate[addrCandidate]._isEligible)
             revert("vote: Candidate disqualified");
 
-        _vote(voteId, candidate);
+        if (
+            election.voteID == voteId &&
+            addrCandidate == candidate[addrCandidate]._address
+        ) {
+            _vote(voteId, addrCandidate);
+        }
     }
 
-    function display(uint256 voteId) external view returns (Election memory) {
-        if (!_isIdUsed[voteId]) revert("vote: Invalid voteID");
-        return contests;
-    }
-
-    function correlate(uint256 voteId) external view returns (uint256) {
-        if (!_isIdUsed[voteId]) revert("correlate: Invalid voteID");
-        if (!contests._started) revert("correlate: Vote not found");
-
-        return contests._candidates._votes; // TODO
+    function displayElection() external view returns (Election memory) {
+        return election;
     }
 
     ////////////////////////////////////////////////////////////////
@@ -218,8 +217,8 @@ contract Voting is ERC721, ERC721URIStorage {
         uint256 voteId,
         uint256 start,
         uint256 end,
-        string calldata uri,
-        string calldata contest
+        string memory uri,
+        string memory contest
     ) internal {
         election.voteID = voteId;
         election.startT = start;
@@ -227,13 +226,30 @@ contract Voting is ERC721, ERC721URIStorage {
         election.tokenId = voteId;
         election.tokenURI = uri;
         election.contest = contest;
-        election._baseURI = "https://ipfs.io/ipfs/";
+        election.baseUri = "https://ipfs.io/ipfs/";
     }
 
-    function _vote(uint256 voteId, address candidate) internal {
-        contests._voters._voted = true;
-        contests._candidates._votes = contests._candidates._votes + 1;
-        // emit Voted(msg.sender, candidate);
+    function _vote(uint256 voteId, address addrCandidate) internal {
+        voters[msg.sender]._voted = true;
+        for (uint c = 0; c < candidates.length; c++) {
+            if (addrCandidate == candidate[addrCandidate]._address) {
+                candidate[addrCandidate]._votes =
+                    candidate[addrCandidate]._votes +
+                    1;
+                candidates[addrCandidate]._votes += 1;
+            }
+        }
+
+        emit Voted(msg.sender, addrCandidate);
+    }
+
+    function retIndexOfCandidate(address addr) internal returns (uint256) {
+        if (addr == candidate[addr]._address) {
+            for (uint i = 0; i < candidates.length; i++) {
+                uint256 indexOfCandidate = candidates[addr].index;
+                return indexOfCandidate;
+            }
+        }
     }
 
     function supportsInterface(
@@ -249,7 +265,7 @@ contract Voting is ERC721, ERC721URIStorage {
     function _safeMint2(
         address to,
         uint256 tokenId,
-        string calldata uri
+        string memory uri
     ) internal {
         _safeMint(to, tokenId);
         _setTokenURI(tokenId, uri);
