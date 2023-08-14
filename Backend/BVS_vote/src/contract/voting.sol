@@ -10,7 +10,6 @@ import "../../lib/openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
 import "../../lib/openzeppelin-contracts/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 
 contract Voting is ERC721, ERC721URIStorage {
-    
     struct Voter {
         uint256 _ID;
         bytes32 _hashVn;
@@ -20,7 +19,7 @@ contract Voting is ERC721, ERC721URIStorage {
     }
 
     struct Candidate {
-        uint256 _index;
+        uint256 _ID;
         uint256 _age;
         uint256 _votes;
         address _address;
@@ -31,18 +30,23 @@ contract Voting is ERC721, ERC721URIStorage {
     }
 
     struct Election {
-        string tokenURI;
-        string contest;
+        uint256 voteID;
         uint256 startT;
         uint256 endT;
-        Voter _voter;
-        Candidate _candidate;
+        uint256 tokenId;
+        string contest;
+        string tokenURI;
+        string baseUri;
+        // Voter _voter;
+        // Candidate _candidate;
     }
+    // initialize structs
+    Voter public voter;
+    Candidate public candidate;
+    Election public election;
 
     address public GModerator;
     address public overseer;
-    uint256 voteID;
-    string baseUri;
 
     Candidate[] public candidates;
 
@@ -59,7 +63,7 @@ contract Voting is ERC721, ERC721URIStorage {
     ) ERC721(name, symbol) {
         GModerator = moderator;
         overseer = _overseer;
-        voteID = voteId;
+        _init(voteId, start, end, tokenUri, tElection);
     }
 
     modifier onlyAdmin() {
@@ -73,13 +77,12 @@ contract Voting is ERC721, ERC721URIStorage {
 
     function addCandidate(
         uint256 voteId,
-        address candidate,
+        uint256 age,
+        address candidate_,
         string calldata fullName,
         string calldata post,
-        string calldata desc,
-        uint256 age
+        string calldata desc
     ) external onlyAdmin {
-        Contest storage contests = contests2Id[voteId];
 
         if (!_isIdUsed[voteId]) revert("addCandidate: Invalid voteId");
         if (candidate == address(0)) revert("addCandidate: Address_0");
@@ -97,7 +100,6 @@ contract Voting is ERC721, ERC721URIStorage {
 
     function rmCandidate(uint256 voteId, address candidate) external onlyAdmin {
         if (!_isIdUsed[voteId]) revert("rmCandidate: Invalid voteId");
-        Contest storage contests = contests2Id[voteId];
 
         if (!contests._candidates._isEligible)
             revert("rmCandidate: Candidate not found");
@@ -109,7 +111,6 @@ contract Voting is ERC721, ERC721URIStorage {
     }
 
     function verify(uint256 voteId, uint256 vn) external {
-        Contest storage contests = contests2Id[voteId];
         address voter = msg.sender;
         if (contests._voters._isVerified) revert("verify: Double reg.");
         if (!_isIdUsed[voteId]) revert("verify: Invalid voteId");
@@ -124,26 +125,8 @@ contract Voting is ERC721, ERC721URIStorage {
         _safeMint2(voter, tokenId, _uri);
     }
 
-    function init(
-        uint256 voteId,
-        uint256 start,
-        uint256 end,
-        string calldata uri,
-        string calldata contest
-    ) external onlyAdmin {
-        if (_isIdUsed[voteId]) revert("init: used ID");
-        bytes32 nullHash = keccak256(abi.encode(""));
-        bytes32 uriHash = keccak256(abi.encode(uri));
-        bytes32 contestHsh = keccak256(abi.encode(contest));
-        if (start >= end) revert("init: Invalid time");
-        if (uriHash == nullHash) revert("init: Empty uri");
-        if (contestHsh == nullHash) revert("init: Empty contest");
-        _init(voteId, start, end, uri, contest);
-    }
-
     function startVote(uint256 voteId) external onlyAdmin {
         if (!_isIdUsed[voteId]) revert("start: Invalid voteID");
-        Contest storage contests = contests2Id[voteId];
         if (contests._started) revert("start: Voting already in session");
         if (block.timestamp < contests._startT) revert("start: not startTime");
 
@@ -152,7 +135,6 @@ contract Voting is ERC721, ERC721URIStorage {
 
     function endVote(uint256 voteId) external onlyAdmin {
         if (!_isIdUsed[voteId]) revert("end: Invalid voteID");
-        Contest storage contests = contests2Id[voteId];
         if (!contests._started) revert("end: Voting not in session");
         if (contests._endT < contests._startT) revert("end: not endTime");
 
@@ -161,7 +143,6 @@ contract Voting is ERC721, ERC721URIStorage {
 
     function vote(uint64 voteId, address candidate) external {
         if (!_isIdUsed[voteId]) revert("vote: Invalid voteID");
-        Contest storage contests = contests2Id[voteId];
         if (!contests._voters._isVerified) revert("vote: Not verified");
         if (contests._voters._voted) revert("vote: Voted");
 
@@ -175,15 +156,13 @@ contract Voting is ERC721, ERC721URIStorage {
         _vote(voteId, candidate);
     }
 
-    function display(uint256 voteId) external view returns (Contest memory) {
+    function display(uint256 voteId) external view returns (Election memory) {
         if (!_isIdUsed[voteId]) revert("vote: Invalid voteID");
-        Contest storage contests = contests2Id[voteId];
         return contests;
     }
 
     function correlate(uint256 voteId) external view returns (uint256) {
         if (!_isIdUsed[voteId]) revert("correlate: Invalid voteID");
-        Contest storage contests = contests2Id[voteId];
         if (!contests._started) revert("correlate: Vote not found");
 
         return contests._candidates._votes; // TODO
@@ -199,33 +178,16 @@ contract Voting is ERC721, ERC721URIStorage {
         string calldata uri,
         string calldata contest
     ) internal {
-        Contest storage contests = contests2Id[voteId];
-        contests._voteID = voteId;
-        contests._startT = start;
-        contests._endT = end;
-        contests._tokenId = voteId;
-        contests._tokenURI = uri;
-        contests._contest = contest;
-        // contests._baseURI = "https://ipfs.io/ipfs/";
-
-        // arrContest.push(Contest({
-        //     _voteID: voteId,
-        //     _totalVotes: 0,
-        //     _startT: start,
-        //     _endT: end,
-        //     _started: false,
-        //     _winner: address(0),
-        //     _baseURI: "",
-        //     _tokenURI: uri,
-        //     _contest: contest,
-        //     _agents: Agent {}
-
-        // }));
-        _setBaseUri("https://ipfs.io/ipfs/");
+        election.voteID = voteId;
+        election.startT = start;
+        election.endT = end;
+        election.tokenId = voteId;
+        election.tokenURI = uri;
+        election.contest = contest;
+        election._baseURI = "https://ipfs.io/ipfs/";
     }
 
     function _vote(uint256 voteId, address candidate) internal {
-        Contest storage contests = contests2Id[voteId];
         contests._voters._voted = true;
         contests._candidates._votes = contests._candidates._votes + 1;
         // emit Voted(msg.sender, candidate);
@@ -238,13 +200,7 @@ contract Voting is ERC721, ERC721URIStorage {
     }
 
     function _baseURI(uint256 voteId) internal view returns (string memory) {
-        Contest storage contests = contests2Id[voteId];
-        return contests._baseURI;
-    }
-
-    function _setBaseUri(uint256 voteId) internal {
-        Contest storage contests = contests2Id[voteId];
-        contests._baseURI = "https://ipfs.io/ipfs/";
+        return election.baseUri;
     }
 
     function _safeMint2(
