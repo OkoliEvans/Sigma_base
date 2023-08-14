@@ -10,6 +10,9 @@ import "../../lib/openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
 import "../../lib/openzeppelin-contracts/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 
 contract Voting is ERC721, ERC721URIStorage {
+    event NewCandidate(address addr, string position);
+    event Verified(address _voter, uint256 vn);
+
     struct Voter {
         uint256 _ID;
         bytes32 _hashVn;
@@ -37,8 +40,6 @@ contract Voting is ERC721, ERC721URIStorage {
         string contest;
         string tokenURI;
         string baseUri;
-        // Voter _voter;
-        // Candidate _candidate;
     }
     // initialize structs
     Voter public voter;
@@ -85,17 +86,16 @@ contract Voting is ERC721, ERC721URIStorage {
         string calldata post,
         string calldata desc
     ) external onlyAdmin {
-
         if (addr == address(0)) revert("addCandidate: Address_0");
-        if (candidate._address == addr)
-            revert("addCandidate: Already added");
-        if(id == 0 || id == candidate._ID) revert("addCAndidate: Invalid ID");
-        if(age == 0) revert("addCandidate: Invalid age");
+        if (candidate._address == addr) revert("addCandidate: Already added");
+        if (id == 0 || id == candidate._ID) revert("addCAndidate: Invalid ID");
+        if (age == 0) revert("addCandidate: Invalid age");
         bytes32 nullHash = keccak256(abi.encode(""));
         bytes32 nameHash = keccak256(abi.encode(fullName));
         bytes32 descHsh = keccak256(abi.encode(desc));
-        if(nameHash == nullHash || descHsh == nullHash) revert("addCandidate: Invalid name or desc");
-        
+        if (nameHash == nullHash || descHsh == nullHash)
+            revert("addCandidate: Invalid name or desc");
+
         candidate.ID = id;
         candidate._age = age;
         candidate._address = addr;
@@ -103,31 +103,64 @@ contract Voting is ERC721, ERC721URIStorage {
         candidate._post = post;
         candidate._desc = desc;
         candidate._isEligible = true;
+
+        candidates.push(
+            Candidate({
+                _ID: id,
+                _age: age,
+                _votes: 0,
+                _address: addr,
+                _fullName: fullName,
+                _post: post,
+                _desc: desc,
+                _isEligible: true
+            })
+        );
+
+        emit NewCandidate(addr, post);
     }
 
-    function rmCandidate(address addr) external onlyAdmin {
-        if (!candidate._isEligible)
-            revert("rmCandidate: Candidate not found");
+    function rmCandidate(
+        address addr
+    ) external onlyAdmin returns (candidates[] memory) {
+        if (!candidate._isEligible) revert("rmCandidate: Candidate not found");
 
         if (candidate._address == addr) {
             candidate._isEligible = false;
             /// TODO >> del candidate from array
+            uint256 IndexCandidate = retIndexOfCandidate(addr);
+            uint256 lastIndex = candidates.length - 1;
+            uint256 lastId = candidates[lastIndex];
+
+            
+        }
+
+        return candidates;
+    }
+
+    function retIndexOfCandidate(address addr) internal returns (uint256) {
+        if(!addr == candidate._address) revert("retIndexOfCandidate: Candidate not found");
+        for (uint i = 0; i < candidates.length; i++) {
+            if (addr == candidate._address) {
+                uint256 indexOfCandidate = candidates[addr].index;
+                return indexOfCandidate;
+            }
         }
     }
 
-    function verify(uint256 voteId, uint256 vn) external {
-        address voter = msg.sender;
-        if (contests._voters._isVerified) revert("verify: Double reg.");
-        if (!_isIdUsed[voteId]) revert("verify: Invalid voteId");
+    function verify(uint256 vn) external {
+        address voter_ = msg.sender;
+        if (voter._isVerified) revert("verify: Double reg.");
         bytes32 vnHash = keccak256(abi.encode(vn));
-        bytes32 verifiedVnHash = contests._voters._hashVn;
+        bytes32 verifiedVnHash = voter._hashVn;
         if (vnHash == verifiedVnHash) revert("verify: VN in database");
 
-        uint256 tokenId = contests._tokenId;
+        uint256 tokenId = election.tokenId;
         tokenId = tokenId + 1;
-        string memory _uri = contests._tokenURI;
-        contests._voters._isVerified = true;
-        _safeMint2(voter, tokenId, _uri);
+        string memory _uri = election.tokenURI;
+        voter._isVerified = true;
+        _safeMint2(voter_, tokenId, _uri);
+        emit Verified(msg.sender, vn);
     }
 
     function startVote(uint256 voteId) external onlyAdmin {
@@ -211,7 +244,7 @@ contract Voting is ERC721, ERC721URIStorage {
     function _safeMint2(
         address to,
         uint256 tokenId,
-        string memory uri
+        string calldata uri
     ) internal {
         _safeMint(to, tokenId);
         _setTokenURI(tokenId, uri);
@@ -220,10 +253,9 @@ contract Voting is ERC721, ERC721URIStorage {
     function tokenURI(
         uint256 tokenId
     ) public view override(ERC721URIStorage, ERC721) returns (string memory) {
-        Contest storage contests = contests2Id[tokenId];
         _requireMinted(tokenId);
 
-        string memory _tokenURI = contests._tokenURI;
+        string memory _tokenURI = election.tokenURI;
         string memory base = _baseURI();
 
         // If there is no base URI, return the token URI.
@@ -238,27 +270,26 @@ contract Voting is ERC721, ERC721URIStorage {
         return super.tokenURI(tokenId);
     }
 
-    // function _beforeTokenTransfer(
-    //     address from,
-    //     address to,
-    //     uint256 tokenId
-
-    // ) internal pure override {
-    //     require(
-    //         from == address(0) || to == address(0),
-    //         "This token cannot be transferred."
-    //     );
-    //     super._beforeTokenTransfer(from, to, tokenId, 1);
-    // }
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal pure override {
+        require(
+            from == address(0) || to == address(0),
+            "This token cannot be transferred."
+        );
+        super._beforeTokenTransfer(from, to, tokenId, 1);
+    }
 
     function _burn(
         uint256 tokenId
     ) internal override(ERC721URIStorage, ERC721) {
         super._burn(tokenId);
 
-        // Contest storage contests = contests2Id[tokenId];
-        // if (bytes(contests._tokenURI).length != 0) {
-        //     delete contests._tokenURI;
-        // }
+        string memory _tokenURI = election.tokenURI;
+        if (bytes(_tokenURI).length != 0) {
+            delete _tokenURI;
+        }
     }
 }
