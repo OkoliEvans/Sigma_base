@@ -75,37 +75,42 @@ contract Voting is ERC721, ERC721URIStorage {
     ///////////////// CORE FUNCTIONS  //////////////////////////////
     ////////////////////////////////////////////////////////////////
 
+    /// @param post is the position ot title that is being contested
+    /// @param desc is the brief description or introduction of the candidate
     function addCandidate(
-        uint256 voteId,
+        uint256 id,
         uint256 age,
-        address candidate_,
+        address addr,
         string calldata fullName,
         string calldata post,
         string calldata desc
     ) external onlyAdmin {
 
-        if (!_isIdUsed[voteId]) revert("addCandidate: Invalid voteId");
-        if (candidate == address(0)) revert("addCandidate: Address_0");
-        if (contests._candidates._address == candidate)
+        if (addr == address(0)) revert("addCandidate: Address_0");
+        if (candidate._address == addr)
             revert("addCandidate: Already added");
-
-        contests._candidates._voteID = voteId;
-        contests._candidates._address = candidate;
-        contests._candidates._fullName = fullName;
-        contests._candidates._post = post;
-        contests._candidates._desc = desc;
-        contests._candidates._age = age;
-        contests._candidates._isEligible = true;
+        if(id == 0 || id == candidate._ID) revert("addCAndidate: Invalid ID");
+        if(age == 0) revert("addCandidate: Invalid age");
+        bytes32 nullHash = keccak256(abi.encode(""));
+        bytes32 nameHash = keccak256(abi.encode(fullName));
+        bytes32 descHsh = keccak256(abi.encode(desc));
+        if(nameHash == nullHash || descHsh == nullHash) revert("addCandidate: Invalid name or desc");
+        
+        candidate.ID = id;
+        candidate._age = age;
+        candidate._address = addr;
+        candidate._fullName = fullName;
+        candidate._post = post;
+        candidate._desc = desc;
+        candidate._isEligible = true;
     }
 
-    function rmCandidate(uint256 voteId, address candidate) external onlyAdmin {
-        if (!_isIdUsed[voteId]) revert("rmCandidate: Invalid voteId");
-
-        if (!contests._candidates._isEligible)
+    function rmCandidate(address addr) external onlyAdmin {
+        if (!candidate._isEligible)
             revert("rmCandidate: Candidate not found");
 
-        if (contests._candidates._address == candidate) {
-            contests._candidates._isEligible = false;
+        if (candidate._address == addr) {
+            candidate._isEligible = false;
             /// TODO >> del candidate from array
         }
     }
