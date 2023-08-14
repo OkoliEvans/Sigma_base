@@ -52,8 +52,9 @@ contract Voting is ERC721, ERC721URIStorage {
     // state variables
     address public GModerator;
     address public overseer;
+    address public winner;
 
-    mapping(address _candidate => Candidate) candidate;
+    mapping(address _candidate => Candidate) public candidate;
     mapping(address _voter => Voter) public voters;
     Candidate[] public candidates;
 
@@ -202,7 +203,7 @@ contract Voting is ERC721, ERC721URIStorage {
             election.voteID == voteId &&
             addrCandidate == candidate[addrCandidate]._address
         ) {
-            _vote(voteId, addrCandidate);
+            _vote(addrCandidate);
         }
     }
 
@@ -229,7 +230,7 @@ contract Voting is ERC721, ERC721URIStorage {
         election.baseUri = "https://ipfs.io/ipfs/";
     }
 
-    function _vote(uint256 voteId, address addrCandidate) internal {
+    function _vote(address addrCandidate) internal {
         voters[msg.sender]._voted = true;
         for (uint c = 0; c < candidates.length; c++) {
             if (addrCandidate == candidate[addrCandidate]._address) {
@@ -294,13 +295,14 @@ contract Voting is ERC721, ERC721URIStorage {
     function _beforeTokenTransfer(
         address from,
         address to,
-        uint256 tokenId
+        uint256 tokenId,
+        uint256 batchsize
     ) internal pure override {
         require(
             from == address(0) || to == address(0),
             "This token cannot be transferred."
         );
-        super._beforeTokenTransfer(from, to, tokenId, 1);
+        super._beforeTokenTransfer(from, to, tokenId, batchsize);
     }
 
     function _burn(
