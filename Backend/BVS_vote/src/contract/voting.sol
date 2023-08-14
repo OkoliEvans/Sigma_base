@@ -11,7 +11,6 @@ import "../../lib/openzeppelin-contracts/contracts/token/ERC721/extensions/ERC72
 
 contract Voting is ERC721, ERC721URIStorage {
     event NewCandidate(address addr, string position);
-    event RmCandidate(address addr, string position);
     event Verified(address _voter, uint256 vn);
     event Voted(address voter, address candidate);
 
@@ -45,8 +44,6 @@ contract Voting is ERC721, ERC721URIStorage {
         bool started;
     }
     // initialize structs
-    // Voter public voter;
-    // Candidate public candidate;
     Election public election;
 
     // state variables
@@ -136,20 +133,19 @@ contract Voting is ERC721, ERC721URIStorage {
             revert("rmCandidate: Candidate already disqualified");
 
         if (addr == candidate[addr]._address) {
-            candidate[addr]._isEligible = false;
+            // delete struct instance of candidate
+           delete candidate[addr];
 
-            /// delete from candidates array
-            uint256 IndexCandidate = retIndexOfCandidate(addr);
-            uint256 lastIndex = candidates.length - 1;
-            // uint256 lastId = candidates[lastIndex];
-
-            uint256 exId = candidates[IndexCandidate];
-            candidates[exId] = lastIndex;
+           // update Candidate array
+            uint256 rmIndex = retIndexOfCandidate(addr);
+            if (rmIndex == candidates.length) {
+            revert("rmCandidate: Candidate not found");
+        }
+            candidates[rmIndex] = candidates[candidates.length - 1];
             candidates.pop();
         }
 
         return candidates;
-        emit RmCandidate(addr, candidate[addr]._post);
     }
 
     function verify(uint256 vn) external {
@@ -235,22 +231,23 @@ contract Voting is ERC721, ERC721URIStorage {
         for (uint c = 0; c < candidates.length; c++) {
             if (addrCandidate == candidate[addrCandidate]._address) {
                 candidate[addrCandidate]._votes =
-                    candidate[addrCandidate]._votes +
-                    1;
-                candidates[addrCandidate]._votes += 1;
+                    candidate[addrCandidate]._votes + 1;
+                // candidates[addrCandidate]._votes += 1;
             }
         }
 
         emit Voted(msg.sender, addrCandidate);
     }
 
-    function retIndexOfCandidate(address addr) internal returns (uint256) {
+    function retIndexOfCandidate(address addr) internal view returns (uint256) {
         if (addr == candidate[addr]._address) {
-            for (uint i = 0; i < candidates.length; i++) {
-                uint256 indexOfCandidate = candidates[addr].index;
-                return indexOfCandidate;
+            for (uint i; i < candidates.length; i++) {
+                if (candidates[i]._address == addr) {
+                return i;
+                }
             }
         }
+        return candidates.length;
     }
 
     function supportsInterface(
@@ -259,7 +256,7 @@ contract Voting is ERC721, ERC721URIStorage {
         return super.supportsInterface(interfaceId);
     }
 
-    function _baseURI(uint256 voteId) internal view returns (string memory) {
+    function _baseURI() internal view override returns (string memory) {
         return election.baseUri;
     }
 
@@ -288,7 +285,6 @@ contract Voting is ERC721, ERC721URIStorage {
         if (bytes(_tokenURI).length > 0) {
             return string(abi.encodePacked(base, _tokenURI));
         }
-
         return super.tokenURI(tokenId);
     }
 
@@ -297,7 +293,7 @@ contract Voting is ERC721, ERC721URIStorage {
         address to,
         uint256 tokenId,
         uint256 batchsize
-    ) internal pure override {
+    ) internal override {
         require(
             from == address(0) || to == address(0),
             "This token cannot be transferred."

@@ -64,7 +64,7 @@ contract votingFactory {
         string calldata tElection
     ) external returns (address cElectionAddr) {
         Contest storage contest = contestToID[voteId];
-        if (!msg.sender == contest._overseer)
+        if (msg.sender != contest._overseer)
             revert("createElection: Not overseer");
         if (!contest._idRegd) revert("createElection: Invalid ID");
         if (contest._logged) revert("createElection: ID already assigned");
@@ -89,11 +89,12 @@ contract votingFactory {
 
         address votingAddr = address(voting);
 
-        contest._contest = tElection;
         contest._logged = true;
-        contest._contest = votingAddr;
+        contest._election = votingAddr;
+        contest._contest = tElection;
         electionToID[votingAddr] = voteId;
         elections.push(votingAddr);
+        cElectionAddr = votingAddr;
         emit CreateElection(votingAddr, msg.sender);
     }
 
