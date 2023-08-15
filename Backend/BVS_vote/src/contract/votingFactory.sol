@@ -9,14 +9,11 @@ pragma solidity ^0.8.13;
 import "./voting.sol";
 
 contract votingFactory {
-
     event CreateElection(address votingAddr, address overseer);
-
 
     struct Contest {
         uint256 _voteID;
         bool _idRegd;
-        bool _logged;
         address _overseer;
         address _election;
         string _contest;
@@ -36,18 +33,6 @@ contract votingFactory {
         Moderator = msg.sender;
     }
 
-    /// @param overseer is the administrator for each election instance
-    function createID(uint256 voteId, address overseer) external onlyModerator {
-        Contest storage contest = contestToID[voteId];
-        if (voteId == contest._voteID) revert("createId: ID taken");
-        if (contest._idRegd) revert("createId: ID taken");
-        if (overseer == address(0)) revert("createID: Address_0");
-
-        contest._voteID = voteId;
-        contest._overseer = overseer;
-        contest._idRegd = true;
-    }
-
     /// @param name_ Name for ERC721 token
     /// @param symbol_ Symbol for ERC721 token
     /// @param tElection holds the election title
@@ -64,10 +49,7 @@ contract votingFactory {
         string calldata tElection
     ) external returns (address cElectionAddr) {
         Contest storage contest = contestToID[voteId];
-        if (msg.sender != contest._overseer)
-            revert("createElection: Not overseer");
-        if (!contest._idRegd) revert("createElection: Invalid ID");
-        if (contest._logged) revert("createElection: ID already assigned");
+        if (voteId == contest._voteID) revert("createElection: ID taken");
         bytes32 nullHash = keccak256(abi.encode(""));
         bytes32 uriHash = keccak256(abi.encode(tokenUri));
         bytes32 electionHsh = keccak256(abi.encode(tElection));
@@ -89,7 +71,9 @@ contract votingFactory {
 
         address votingAddr = address(voting);
 
-        contest._logged = true;
+        contest._voteID = voteId;
+        contest._idRegd = true;
+        contest._overseer = msg.sender;
         contest._election = votingAddr;
         contest._contest = tElection;
         electionToID[votingAddr] = voteId;
@@ -99,32 +83,33 @@ contract votingFactory {
     }
 
     ///@notice Function returns the ID of an election when the address is supplied
-    function retElectionID(address electionAddr) external view returns(uint256 Id) {
+    function retElectionID(
+        address electionAddr
+    ) external view returns (uint256 Id) {
         Id = electionToID[electionAddr];
     }
 
-
-    ///@notice Function returns all election instances created 
-    function retElections() external view returns(address[] memory) {
+    ///@notice Function returns all election instances created
+    function retElections() external view returns (address[] memory) {
         return elections;
     }
 
     ///@notice Function reassigns Moderator role to new address
     function replcModerator(address newMod) external onlyModerator {
-        if(newMod == address(0)) revert("replaceModerator: Address_0");
+        if (newMod == address(0)) revert("replaceModerator: Address_0");
         Moderator = newMod;
     }
 
     ///@notice Function returns the total number, n, of election instances created
-    function nElections() external view returns(uint256 totalElections) {
+    function nElections() external view returns (uint256 totalElections) {
         totalElections = elections.length;
     }
 
     function wthr(address to, uint amount) external onlyModerator {
-        if(to == address(0)) revert("wthr: Address_0");
+        if (to == address(0)) revert("wthr: Address_0");
         (bool success, ) = payable(to).call{value: amount}("");
-        if(!success) revert("wthr: Ether withdraw fail..");
+        if (!success) revert("wthr: Ether withdraw fail..");
     }
 
-    receive() external payable{}
+    receive() external payable {}
 }
