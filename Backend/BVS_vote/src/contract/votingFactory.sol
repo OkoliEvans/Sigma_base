@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.15;
 
 /// @title An on-chain voting system that only allows verified ctizens to vote, mitigating fraud and double voting.
 /// @author Okoli Evans, Ominisan Patrick, Olorunfemi Babalola Samuel
@@ -21,7 +21,7 @@ contract votingFactory {
 
     mapping(uint256 contestID => Contest) public contestToID;
     mapping(address election => uint256 Id) electionToID;
-    address[] elections;
+    address[] public elections;
     address public Moderator;
 
     modifier onlyModerator() {
@@ -35,7 +35,6 @@ contract votingFactory {
 
     /// @param name_ Name for ERC721 token
     /// @param symbol_ Symbol for ERC721 token
-    /// @param tElection holds the election title
     /// @param cElectionAddr stands for child Election Address
     /// @param endT is end time
     /// @param startT is start time
@@ -45,23 +44,19 @@ contract votingFactory {
         uint256 endT,
         string calldata name_,
         string calldata symbol_,
-        string calldata tokenUri,
-        string calldata tElection
+        string calldata tokenUri
     ) external returns (address cElectionAddr) {
         Contest storage contest = contestToID[voteId];
         if (voteId == contest._voteID) revert("createElection: ID taken");
         bytes32 nullHash = keccak256(abi.encode(""));
         bytes32 uriHash = keccak256(abi.encode(tokenUri));
-        bytes32 electionHsh = keccak256(abi.encode(tElection));
         if (startT >= endT) revert("init: Invalid time");
         if (uriHash == nullHash) revert("init: Empty uri");
-        if (electionHsh == nullHash) revert("init: Empty contest");
 
         Voting voting = new Voting(
             name_,
             symbol_,
             tokenUri,
-            tElection,
             voteId,
             startT,
             endT,
@@ -75,7 +70,7 @@ contract votingFactory {
         contest._idRegd = true;
         contest._overseer = msg.sender;
         contest._election = votingAddr;
-        contest._contest = tElection;
+        contest._contest = name_;
         electionToID[votingAddr] = voteId;
         elections.push(votingAddr);
         cElectionAddr = votingAddr;
