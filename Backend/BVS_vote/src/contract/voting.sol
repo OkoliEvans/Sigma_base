@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.15;
 
 /// @title An on-chain voting system that only allows verified ctizens to vote, mitigating fraud and double voting.
 /// @author Okoli Evans, Ominisan Patrick, Olorunfemi Babalola Samuel
@@ -11,11 +11,11 @@ import "../../lib/openzeppelin-contracts/contracts/token/ERC721/extensions/ERC72
 
 contract Voting is ERC721, ERC721URIStorage {
     event NewCandidate(address addr, string position);
-    event Verified(address _voter, uint256 vn);
+    event Verified(address _voter, string vn);
     event Voted(address voter, address candidate);
 
     struct Voter {
-        uint256 _ID;
+        string _ID;
         bytes32 _hashVn;
         address _address;
         bool _isVerified;
@@ -59,7 +59,6 @@ contract Voting is ERC721, ERC721URIStorage {
         string memory name,
         string memory symbol,
         string memory tokenUri,
-        string memory tElection,
         uint256 voteId,
         uint256 start,
         uint256 end,
@@ -68,7 +67,7 @@ contract Voting is ERC721, ERC721URIStorage {
     ) ERC721(name, symbol) {
         GModerator = moderator;
         overseer = _overseer;
-        _init(voteId, start, end, tokenUri, tElection);
+        _init(voteId, start, end, tokenUri, name);
     }
 
     modifier onlyAdmin() {
@@ -148,7 +147,7 @@ contract Voting is ERC721, ERC721URIStorage {
         return candidates;
     }
 
-    function verify(uint256 vn) external {
+    function verify(string calldata vn) external {
         address voter_ = msg.sender;
         if (voters[voter_]._isVerified) revert("verify: Double reg.");
         bytes32 vnHash = keccak256(abi.encode(vn));
