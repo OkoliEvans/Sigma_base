@@ -34,7 +34,6 @@ contract Voting is ERC721, ERC721URIStorage {
     }
 
     struct Election {
-        uint256 voteID;
         uint256 startT;
         uint256 endT;
         uint256 tokenId;
@@ -59,15 +58,21 @@ contract Voting is ERC721, ERC721URIStorage {
     constructor(
         string memory name,
         string memory symbol,
-        uint256 voteId,
+        string memory uri,
+        string memory contest,
+        uint256 start,
+        uint256 end,
         address _overseer,
-        address moderator, 
-        address _factory
+        address moderator
     ) ERC721(name, symbol) {
         GModerator = moderator;
         overseer = _overseer;
-        factory = _factory;
-        _init(voteId, name);
+
+        election.startT = start;
+        election.endT = end;
+        election.contest = contest;
+        election.tokenURI = uri;
+        election.baseUri = "https://ipfs.io/ipfs/";
     }
 
     modifier onlyAdmin() {
@@ -80,7 +85,7 @@ contract Voting is ERC721, ERC721URIStorage {
     ////////////////////////////////////////////////////////////////
 
     function init2(string memory uri, uint256 start, uint256 end) external {
-        if(msg.sender != factory) revert("init2: unauthorized call");
+        if (msg.sender != factory) revert("init2: unauthorized call");
         election.startT = start;
         election.endT = end;
         election.tokenURI = uri;
@@ -140,12 +145,12 @@ contract Voting is ERC721, ERC721URIStorage {
 
         if (addr == candidate[addr]._address) {
             // delete struct instance of candidate
-           delete candidate[addr];
+            delete candidate[addr];
 
-           // update Candidate array
+            // update Candidate array
             uint256 rmIndex = _retIndexOfCandidate(addr);
             if (rmIndex == candidates.length) {
-            revert("rmCandidate: Candidate not found");
+                revert("rmCandidate: Candidate not found");
             }
             candidates[rmIndex] = candidates[candidates.length - 1];
             candidates.pop();
@@ -194,17 +199,14 @@ contract Voting is ERC721, ERC721URIStorage {
         election.started = false;
     }
 
-    function vote(uint64 voteId, address addrCandidate) external {
+    function vote(address addrCandidate) external {
         address voter_ = msg.sender;
         if (!voters[voter_]._isVerified) revert("vote: Not verified");
         if (voters[voter_]._voted) revert("vote: Voted");
         if (!candidate[addrCandidate]._isEligible)
             revert("vote: Candidate disqualified");
 
-        if (
-            election.voteID == voteId &&
-            addrCandidate == candidate[addrCandidate]._address
-        ) {
+        if (addrCandidate == candidate[addrCandidate]._address) {
             _vote(addrCandidate);
         }
     }
@@ -216,25 +218,26 @@ contract Voting is ERC721, ERC721URIStorage {
     ////////////////////////////////////////////////////////////////
     //////////////////// HELPER FUNCTIONS /////////////////////////
     ///////////////////////////////////////////////////////////////
-    function _init(
-        uint256 voteId,
-        string memory contest
-    ) internal {
-        election.voteID = voteId;
-        // election.startT = start;
-        // election.endT = end;
-        election.tokenId = voteId;
-        // election.tokenURI = uri;
-        election.contest = contest;
-        election.baseUri = "https://ipfs.io/ipfs/";
-    }
+    // function _init(
+    //     uint256 voteId,
+    //     string memory contest
+    // ) internal {
+    //     election.voteID = voteId;
+    //     // election.startT = start;
+    //     // election.endT = end;
+    //     election.tokenId = voteId;
+    //     // election.tokenURI = uri;
+    //     election.contest = contest;
+    //     election.baseUri = "https://ipfs.io/ipfs/";
+    // }
 
     function _vote(address addrCandidate) internal {
         voters[msg.sender]._voted = true;
         for (uint c = 0; c < candidates.length; c++) {
             if (addrCandidate == candidate[addrCandidate]._address) {
                 candidate[addrCandidate]._votes =
-                    candidate[addrCandidate]._votes + 1;
+                    candidate[addrCandidate]._votes +
+                    1;
                 // candidates[addrCandidate]._votes += 1;
             }
         }
@@ -242,11 +245,13 @@ contract Voting is ERC721, ERC721URIStorage {
         emit Voted(msg.sender, addrCandidate);
     }
 
-    function _retIndexOfCandidate(address addr) internal view returns (uint256) {
+    function _retIndexOfCandidate(
+        address addr
+    ) internal view returns (uint256) {
         if (addr == candidate[addr]._address) {
             for (uint i; i < candidates.length; i++) {
                 if (candidates[i]._address == addr) {
-                return i;
+                    return i;
                 }
             }
         }

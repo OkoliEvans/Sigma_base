@@ -45,7 +45,8 @@ contract votingFactory {
         uint256 voteId,
         string calldata name_,
         string calldata symbol_,
-        string calldata tokenUri
+        string calldata tokenUri,
+        string calldata _contest
     ) external returns (address cElectionAddr) {
         Contest storage contest = contestToID[voteId];
         if (voteId == contest._voteID) revert("createElection: ID taken");
@@ -57,10 +58,12 @@ contract votingFactory {
         Voting voting = new Voting(
             name_,
             symbol_,
-            voteId,
+            tokenUri,
+            _contest,
+            startT,
+            endT,
             msg.sender,
-            Moderator,
-            address(this)
+            Moderator
         );
 
         address votingAddr = address(voting);
@@ -69,12 +72,10 @@ contract votingFactory {
         contest._idRegd = true;
         contest._overseer = msg.sender;
         contest._election = votingAddr;
-        contest._contest = name_;
+        contest._contest = _contest;
         
         electionToID[votingAddr] = voteId;
         elections.push(votingAddr);
-
-        IVoting(votingAddr).init2(tokenUri, startT, endT);
 
         cElectionAddr = votingAddr;
         emit CreateElection(votingAddr, msg.sender);
