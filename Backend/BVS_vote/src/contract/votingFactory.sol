@@ -7,6 +7,7 @@ pragma solidity ^0.8.15;
 /// @dev Restricts access to 'Controller', 'Agents' and actual voters. Returns vote counts autonomously to the frontend via interval calls
 
 import "./voting.sol";
+import "../interface/IVoting.sol";
 
 contract votingFactory {
     event CreateElection(address votingAddr, address overseer);
@@ -39,9 +40,9 @@ contract votingFactory {
     /// @param endT is end time
     /// @param startT is start time
     function createElection(
-        uint256 voteId,
         uint256 startT,
         uint256 endT,
+        uint256 voteId,
         string calldata name_,
         string calldata symbol_,
         string calldata tokenUri
@@ -56,12 +57,10 @@ contract votingFactory {
         Voting voting = new Voting(
             name_,
             symbol_,
-            tokenUri,
             voteId,
-            startT,
-            endT,
             msg.sender,
-            Moderator
+            Moderator,
+            address(this)
         );
 
         address votingAddr = address(voting);
@@ -71,8 +70,12 @@ contract votingFactory {
         contest._overseer = msg.sender;
         contest._election = votingAddr;
         contest._contest = name_;
+        
         electionToID[votingAddr] = voteId;
         elections.push(votingAddr);
+
+        IVoting(votingAddr).init2(tokenUri, startT, endT);
+
         cElectionAddr = votingAddr;
         emit CreateElection(votingAddr, msg.sender);
     }
