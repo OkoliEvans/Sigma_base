@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.15;
+pragma solidity 0.8.21;
 
 /// @title An on-chain voting system that only allows verified ctizens to vote, mitigating fraud and double voting.
 /// @author Okoli Evans, Ominisan Patrick, Olorunfemi Babalola Samuel
@@ -49,7 +49,6 @@ contract Voting is ERC721, ERC721URIStorage {
     address public GModerator;
     address public overseer;
     address public winner;
-    address public factory;
 
     mapping(address _candidate => Candidate) public candidate;
     mapping(address _voter => Voter) public voters;
@@ -60,16 +59,14 @@ contract Voting is ERC721, ERC721URIStorage {
         string memory symbol,
         string memory uri,
         string memory contest,
-        uint256 start,
-        uint256 end,
         address _overseer,
-        address moderator
+        address moderator,
+        uint start
     ) ERC721(name, symbol) {
         GModerator = moderator;
         overseer = _overseer;
 
         election.startT = start;
-        election.endT = end;
         election.contest = contest;
         election.tokenURI = uri;
         election.baseUri = "https://ipfs.io/ipfs/";
@@ -83,13 +80,6 @@ contract Voting is ERC721, ERC721URIStorage {
     ////////////////////////////////////////////////////////////////
     ///////////////// CORE FUNCTIONS  //////////////////////////////
     ////////////////////////////////////////////////////////////////
-
-    function init2(string memory uri, uint256 start, uint256 end) external {
-        if (msg.sender != factory) revert("init2: unauthorized call");
-        election.startT = start;
-        election.endT = end;
-        election.tokenURI = uri;
-    }
 
     /// @param post is the position ot title that is being contested
     /// @param desc is the brief description or introduction of the candidate
@@ -183,12 +173,14 @@ contract Voting is ERC721, ERC721URIStorage {
         return voters[addrVoter];
     }
 
-    function startVote() external onlyAdmin {
+    function startVote(uint end) external onlyAdmin {
+        if( end < election.startT) revert("startVote: Invalid time");
         if (candidates.length <= 0)
             revert("startVote: No registered candidates");
         if (election.started) revert("start: Voting already in session");
         if (block.timestamp < election.startT) revert("start: not startTime");
 
+        election.endT =end;
         election.started = true;
     }
 
@@ -218,26 +210,13 @@ contract Voting is ERC721, ERC721URIStorage {
     ////////////////////////////////////////////////////////////////
     //////////////////// HELPER FUNCTIONS /////////////////////////
     ///////////////////////////////////////////////////////////////
-    // function _init(
-    //     uint256 voteId,
-    //     string memory contest
-    // ) internal {
-    //     election.voteID = voteId;
-    //     // election.startT = start;
-    //     // election.endT = end;
-    //     election.tokenId = voteId;
-    //     // election.tokenURI = uri;
-    //     election.contest = contest;
-    //     election.baseUri = "https://ipfs.io/ipfs/";
-    // }
 
     function _vote(address addrCandidate) internal {
         voters[msg.sender]._voted = true;
         for (uint c = 0; c < candidates.length; c++) {
             if (addrCandidate == candidate[addrCandidate]._address) {
                 candidate[addrCandidate]._votes =
-                    candidate[addrCandidate]._votes +
-                    1;
+                    candidate[addrCandidate]._votes + 1;
                 // candidates[addrCandidate]._votes += 1;
             }
         }

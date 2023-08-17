@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.15;
+pragma solidity 0.8.21;
 
 /// @title An on-chain voting system that only allows verified ctizens to vote, mitigating fraud and double voting.
 /// @author Okoli Evans, Ominisan Patrick, Olorunfemi Babalola Samuel
@@ -36,23 +36,20 @@ contract votingFactory {
 
     /// @param name_ Name for ERC721 token
     /// @param symbol_ Symbol for ERC721 token
-    /// @param cElectionAddr stands for child Election Address
-    /// @param endT is end time
-    /// @param startT is start time
+    /// @param childElection stands for child Election Address
     function createElection(
-        uint256 startT,
-        uint256 endT,
         uint256 voteId,
         string calldata name_,
         string calldata symbol_,
         string calldata tokenUri,
-        string calldata _contest
-    ) external returns (address cElectionAddr) {
+        string calldata _contest,
+        uint start
+    ) external returns (address childElection) {
         Contest storage contest = contestToID[voteId];
         if (voteId == contest._voteID) revert("createElection: ID taken");
+        if(block.timestamp > start) revert("createElection: Invalid time");
         bytes32 nullHash = keccak256(abi.encode(""));
         bytes32 uriHash = keccak256(abi.encode(tokenUri));
-        if (startT >= endT) revert("init: Invalid time");
         if (uriHash == nullHash) revert("init: Empty uri");
 
         Voting voting = new Voting(
@@ -60,10 +57,9 @@ contract votingFactory {
             symbol_,
             tokenUri,
             _contest,
-            startT,
-            endT,
             msg.sender,
-            Moderator
+            Moderator,
+            start
         );
 
         address votingAddr = address(voting);
@@ -77,7 +73,7 @@ contract votingFactory {
         electionToID[votingAddr] = voteId;
         elections.push(votingAddr);
 
-        cElectionAddr = votingAddr;
+        childElection = votingAddr;
         emit CreateElection(votingAddr, msg.sender);
     }
 
