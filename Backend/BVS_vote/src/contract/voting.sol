@@ -6,10 +6,14 @@ pragma solidity 0.8.21;
 /// @notice For open and trusted voting system that allows only verified accounts to access vote function. Vote results are returned in real time.
 /// @dev Restricts access to 'Controller', 'Agents' and actual voters. Returns vote counts autonomously to the frontend via interval calls
 
+import "../../lib/openzeppelin-contracts/contracts/utils/Counters.sol";
 import "../../lib/openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
 import "../../lib/openzeppelin-contracts/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 
 contract Voting is ERC721, ERC721URIStorage {
+    using Counters for Counters.Counter;
+    Counters.Counter private _tokenId;
+
     event NewCandidate(address addr, string position);
     event Verified(address _voter, string vn);
     event Voted(address voter, address candidate);
@@ -36,7 +40,6 @@ contract Voting is ERC721, ERC721URIStorage {
     struct Election {
         uint256 startT;
         uint256 endT;
-        uint256 tokenId;
         string contest;
         string tokenURI;
         string baseUri;
@@ -52,6 +55,7 @@ contract Voting is ERC721, ERC721URIStorage {
 
     mapping(address _candidate => Candidate) public candidate;
     mapping(address _voter => Voter) public voters;
+    bytes32[] verifications;
     Candidate[] public candidates;
 
     constructor(
@@ -149,23 +153,24 @@ contract Voting is ERC721, ERC721URIStorage {
         return candidates;
     }
 
-    function verify(string calldata vn) external {
-        address voter_ = msg.sender;
-        if (voters[voter_]._isVerified) revert("verify: Double reg.");
+    function verify(string calldata vn) external returns (bytes32) {
+        Voter storage _voter = voters[msg.sender];
+        if (_voter._isVerified) revert("verify: Already verified");
         bytes32 vnHash = keccak256(abi.encode(vn));
-        bytes32 verifiedVnHash = voters[voter_]._hashVn;
-        if (vnHash == verifiedVnHash) revert("verify: VN in database");
 
-        string memory uri_ = election.tokenURI;
-        uint256 tokenId = election.tokenId;
-        tokenId = tokenId + 1;
+        for (uint256 vf = 0; vf < verifications.length; vf++) {
+            if (verifications[vf] == vnHash) {
+                revert("verify: VN already in database");
+            } else {
+                _voter._ID = vn;
+                _voter._hashVn = vnHash;
+                _voter._address = msg.sender;
+                _voter._isVerified = true;
+                _voterToHash[msg.sender] = vnHash;
 
-        voters[voter_]._ID = vn;
-        voters[voter_]._hashVn = vnHash;
-        voters[voter_]._address = msg.sender;
-        voters[voter_]._isVerified = true;
-        _safeMint2(voter_, tokenId, uri_);
-        emit Verified(msg.sender, vn);
+                emit Verified(msg.sender, vn);
+            }
+        }
     }
 
     ///@notice Returns details of a particular voter
@@ -174,25 +179,30 @@ contract Voting is ERC721, ERC721URIStorage {
     }
 
     function startVote(uint end) external onlyAdmin {
-        if( end < election.startT) revert("startVote: Invalid time");
+        if (end < election.startT) revert("startVote: Invalid time");
         if (candidates.length <= 0)
             revert("startVote: No registered candidates");
         if (election.started) revert("start: Voting already in session");
         if (block.timestamp < election.startT) revert("start: not startTime");
 
-        election.endT =end;
+        election.endT = end;
         election.started = true;
     }
 
     function endVote() external onlyAdmin {
         if (!election.started) revert("end: Voting not in session");
-        if (election.endT < election.startT) revert("end: not endTime");
+        if (block.timestamp < election.endT) revert("end: not endTime");
 
         election.started = false;
     }
 
     function vote(address addrCandidate) external {
         address voter_ = msg.sender;
+        string memory uri_ = election.tokenURI;
+        uint256 tokenId = _tokenId.current();
+        _tokenId.increment();
+
+        if (!election.started) revert("vote: Voting not started");
         if (!voters[voter_]._isVerified) revert("vote: Not verified");
         if (voters[voter_]._voted) revert("vote: Voted");
         if (!candidate[addrCandidate]._isEligible)
@@ -200,11 +210,16 @@ contract Voting is ERC721, ERC721URIStorage {
 
         if (addrCandidate == candidate[addrCandidate]._address) {
             _vote(addrCandidate);
+            _safeMint2(msg.sender, tokenId, uri_);
         }
     }
 
     function displayElection() external view returns (Election memory) {
         return election;
+    }
+
+    function winnerName() external returns (string memory _winner) {
+        _winner = candidates[_setWinner()]._fullName;
     }
 
     ////////////////////////////////////////////////////////////////
@@ -213,15 +228,25 @@ contract Voting is ERC721, ERC721URIStorage {
 
     function _vote(address addrCandidate) internal {
         voters[msg.sender]._voted = true;
-        for (uint c = 0; c < candidates.length; c++) {
-            if (addrCandidate == candidate[addrCandidate]._address) {
-                candidate[addrCandidate]._votes =
-                    candidate[addrCandidate]._votes + 1;
-                // candidates[addrCandidate]._votes += 1;
-            }
-        }
+
+        candidate[addrCandidate]._votes += 1;
+        // candidates[addrCandidate]._votes += 1;
+        _setWinner();
 
         emit Voted(msg.sender, addrCandidate);
+    }
+
+    function _setWinner() internal returns (uint winningVote_) {
+        uint256 winningVote = 0;
+        for (uint c; c < candidates.length; c++) {
+            if (candidates[c]._votes > winningVote) {
+                winningVote = candidates[c]._votes;
+                winningVote_ = c;
+
+                address nWinner = candidates[winningVote_]._address;
+                winner = nWinner;
+            }
+        }
     }
 
     function _retIndexOfCandidate(

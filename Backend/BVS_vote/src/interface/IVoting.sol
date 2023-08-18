@@ -3,27 +3,27 @@ pragma solidity ^0.8.13;
 
 interface IVoting {
 
-    function init2(string memory uri, uint start, uint end) external;
-
-
     /// @notice To add vote candidates for a post
-    function addCandidate(string calldata name, string calldata post, uint id, uint voteId) external returns(bool);
+    function addCandidate(uint id, uint age, address addr, string calldata name, string calldata post, string calldata desc) external;
 
     /// @notice To remove vote candidates for a post
     function rmCandidate(address addr) external returns(address[] memory);
 
     /// @notice To verify voters 
-    function verify(uint vn) external;
+    function verify(string memory vn) external returns(bytes32);
 
+    // function retVoter(address voter) external view returns(Voter memory);
 
     /// @notice To start voting process
-    function startVote() external;
+    function startVote(uint end) external;
 
     /// @notice To end voting process
     function endVote() external;
 
 
     /// @notice To collect votes
-    function vote(uint voteId, address candidate) external returns (bool);
+    function vote(address candidate) external;
+
+    function winnerName() external returns(string memory _winner);
 
 }

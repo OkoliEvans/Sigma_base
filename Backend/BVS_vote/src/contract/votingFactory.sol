@@ -50,7 +50,7 @@ contract votingFactory {
         if(block.timestamp > start) revert("createElection: Invalid time");
         bytes32 nullHash = keccak256(abi.encode(""));
         bytes32 uriHash = keccak256(abi.encode(tokenUri));
-        if (uriHash == nullHash) revert("init: Empty uri");
+        if (uriHash == nullHash) revert("createElection: Empty uri");
 
         Voting voting = new Voting(
             name_,
@@ -104,6 +104,11 @@ contract votingFactory {
         if (to == address(0)) revert("wthr: Address_0");
         (bool success, ) = payable(to).call{value: amount}("");
         if (!success) revert("wthr: Ether withdraw fail..");
+    }
+
+    function rc(uint voteId) external view returns(Contest memory) {
+        Contest storage contest = contestToID[voteId];
+        return contest;
     }
 
     receive() external payable {}
