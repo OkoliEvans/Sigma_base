@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.21;
+pragma solidity 0.8.17;
 
 /// @title An on-chain voting system that only allows verified ctizens to vote, mitigating fraud and double voting.
 /// @author Okoli Evans, Ominisan Patrick, Olorunfemi Babalola Samuel
@@ -19,7 +19,6 @@ contract Voting is ERC721, ERC721URIStorage {
     event Voted(address voter, address candidate);
 
     struct Voter {
-        string _ID;
         bytes32 _hashVn;
         address _address;
         bool _isVerified;
@@ -27,7 +26,6 @@ contract Voting is ERC721, ERC721URIStorage {
     }
 
     struct Candidate {
-        uint256 _ID;
         uint256 _age;
         uint256 _votes;
         address _address;
@@ -52,9 +50,11 @@ contract Voting is ERC721, ERC721URIStorage {
     address public GModerator;
     address public overseer;
     address public winner;
+    uint256 public totalVotes;
+    uint256 _winningVote;
 
-    mapping(address _candidate => Candidate) public candidate;
-    mapping(address _voter => Voter) public voters;
+    mapping(address => Candidate) public candidate;
+    mapping(address => Voter) public voters;
     bytes32[] verifications;
     Candidate[] public candidates;
 
@@ -88,7 +88,6 @@ contract Voting is ERC721, ERC721URIStorage {
     /// @param post is the position ot title that is being contested
     /// @param desc is the brief description or introduction of the candidate
     function addCandidate(
-        uint256 id,
         uint256 age,
         address addr,
         string calldata fullName,
@@ -98,8 +97,6 @@ contract Voting is ERC721, ERC721URIStorage {
         if (addr == address(0)) revert("addCandidate: Address_0");
         if (candidate[addr]._address == addr)
             revert("addCandidate: Already added");
-        if (id == 0 || id == candidate[addr]._ID)
-            revert("addCAndidate: Invalid ID");
         if (age == 0) revert("addCandidate: Invalid age");
         bytes32 nullHash = keccak256(abi.encode(""));
         bytes32 nameHash = keccak256(abi.encode(fullName));
@@ -107,7 +104,6 @@ contract Voting is ERC721, ERC721URIStorage {
         if (nameHash == nullHash || descHsh == nullHash)
             revert("addCandidate: Invalid name or desc");
 
-        candidate[addr]._ID = id;
         candidate[addr]._age = age;
         candidate[addr]._address = addr;
         candidate[addr]._fullName = fullName;
@@ -117,7 +113,6 @@ contract Voting is ERC721, ERC721URIStorage {
 
         candidates.push(
             Candidate({
-                _ID: id,
                 _age: age,
                 _votes: 0,
                 _address: addr,
@@ -153,25 +148,26 @@ contract Voting is ERC721, ERC721URIStorage {
         return candidates;
     }
 
-    function verify(string calldata vn) external returns (bytes32) {
+    function verify(string calldata vn) external returns (bool success) {
         Voter storage _voter = voters[msg.sender];
         if (_voter._isVerified) revert("verify: Already verified");
         bytes32 vnHash = keccak256(abi.encode(vn));
 
-        for (uint256 vf = 0; vf < verifications.length; vf++) {
-            if (verifications[vf] == vnHash) {
+        for (uint256 i = 0; i < verifications.length; i++) {
+            if (verifications[i] == vnHash) {
                 revert("verify: VN already in database");
-            } else {
-                _voter._ID = vn;
-                _voter._hashVn = vnHash;
-                _voter._address = msg.sender;
-                _voter._isVerified = true;
-                _voterToHash[msg.sender] = vnHash;
-
-                emit Verified(msg.sender, vn);
             }
         }
+
+        verifications.push(vnHash);
+        _voter._hashVn = vnHash;
+        _voter._address = msg.sender;
+        _voter._isVerified = true;
+
+        emit Verified(msg.sender, vn);
+        success = true;
     }
+
 
     ///@notice Returns details of a particular voter
     function retVoter(address addrVoter) external view returns (Voter memory) {
@@ -218,8 +214,21 @@ contract Voting is ERC721, ERC721URIStorage {
         return election;
     }
 
-    function winnerName() external returns (string memory _winner) {
-        _winner = candidates[_setWinner()]._fullName;
+    function winnerName() external view returns (address) {
+        // uint256 winningIndex = _setWinner();
+        // _winner = candidates[_winningVote]._fullName;
+
+        // Candidate storage winnar = candidate[winner];
+        // return winnar._fullName;
+        return winner;
+    }
+
+    function gtTotalVotes() external view returns(uint) {
+        return totalVotes;
+    }
+
+    function gvpc(address cdn) external view returns(uint) {
+        return candidate[cdn]._votes;
     }
 
     ////////////////////////////////////////////////////////////////
@@ -230,23 +239,25 @@ contract Voting is ERC721, ERC721URIStorage {
         voters[msg.sender]._voted = true;
 
         candidate[addrCandidate]._votes += 1;
+        totalVotes += 1;
         // candidates[addrCandidate]._votes += 1;
         _setWinner();
 
         emit Voted(msg.sender, addrCandidate);
     }
 
-    function _setWinner() internal returns (uint winningVote_) {
+    function _setWinner() internal returns (uint) {
         uint256 winningVote = 0;
-        for (uint c; c < candidates.length; c++) {
+        for (uint c = 0; c < candidates.length; c++) {
             if (candidates[c]._votes > winningVote) {
                 winningVote = candidates[c]._votes;
-                winningVote_ = c;
+                _winningVote = c;
 
-                address nWinner = candidates[winningVote_]._address;
-                winner = nWinner;
+                winner = candidates[_winningVote]._address;
+                // winner = nWinner;
             }
         }
+        return _winningVote;
     }
 
     function _retIndexOfCandidate(

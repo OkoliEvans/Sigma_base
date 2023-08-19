@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.21;
+pragma solidity 0.8.17;
 
 /// @title An on-chain voting system that only allows verified ctizens to vote, mitigating fraud and double voting.
 /// @author Okoli Evans, Ominisan Patrick, Olorunfemi Babalola Samuel
@@ -20,8 +20,8 @@ contract votingFactory {
         string _contest;
     }
 
-    mapping(uint256 contestID => Contest) public contestToID;
-    mapping(address election => uint256 Id) electionToID;
+    mapping(uint256 => Contest) public contestToID;
+    mapping(address => uint256) electionToID;
     address[] public elections;
     address public Moderator;
 
