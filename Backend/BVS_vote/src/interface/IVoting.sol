@@ -3,7 +3,7 @@ pragma solidity ^0.8.13;
 
 interface IVoting {
 
-    function gvpc(address cdn) external view returns(uint);
+    function votesPerCandidate(address cdn) external view returns(uint);
 
     function gtTotalVotes() external view returns(uint);
 
@@ -24,10 +24,9 @@ interface IVoting {
     /// @notice To end voting process
     function endVote() external;
 
-
     /// @notice To collect votes
     function vote(address candidate) external;
 
-    function winnerName() external returns(address);
+    function winnerName() external returns(address, string memory);
 
 }

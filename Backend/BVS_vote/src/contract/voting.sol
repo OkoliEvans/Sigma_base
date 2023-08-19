@@ -214,21 +214,16 @@ contract Voting is ERC721, ERC721URIStorage {
         return election;
     }
 
-    function winnerName() external view returns (address) {
-        // uint256 winningIndex = _setWinner();
-        // _winner = candidates[_winningVote]._fullName;
-
-        // Candidate storage winnar = candidate[winner];
-        // return winnar._fullName;
-        return winner;
+    function winnerName() external view returns (address, string memory) {
+        return (winner, candidate[winner]._fullName);
     }
 
     function gtTotalVotes() external view returns(uint) {
         return totalVotes;
     }
 
-    function gvpc(address cdn) external view returns(uint) {
-        return candidate[cdn]._votes;
+    function votesPerCandidate(address cand) external view returns(uint) {
+        return candidate[cand]._votes;
     }
 
     ////////////////////////////////////////////////////////////////
@@ -238,12 +233,17 @@ contract Voting is ERC721, ERC721URIStorage {
     function _vote(address addrCandidate) internal {
         voters[msg.sender]._voted = true;
 
-        candidate[addrCandidate]._votes += 1;
-        totalVotes += 1;
-        // candidates[addrCandidate]._votes += 1;
-        _setWinner();
+        for (uint i = 0; i < candidates.length; i++) {
+            if(candidates[i]._address == addrCandidate) {
+                candidates[i]._votes += 1;
+                candidate[addrCandidate]._votes += 1;
+                totalVotes += 1;    
+                _setWinner();
 
-        emit Voted(msg.sender, addrCandidate);
+                emit Voted(msg.sender, addrCandidate);
+                break;
+            }
+        }
     }
 
     function _setWinner() internal returns (uint) {
@@ -254,7 +254,6 @@ contract Voting is ERC721, ERC721URIStorage {
                 _winningVote = c;
 
                 winner = candidates[_winningVote]._address;
-                // winner = nWinner;
             }
         }
         return _winningVote;
@@ -311,6 +310,7 @@ contract Voting is ERC721, ERC721URIStorage {
         return super.tokenURI(tokenId);
     }
 
+    // soulbound >> non transferable
     function _beforeTokenTransfer(
         address from,
         address to,

@@ -80,9 +80,9 @@ contract CounterTest is Test {
 
         IVoting(childElection).gtTotalVotes();
 
-        IVoting(childElection).gvpc(c1);
+        IVoting(childElection).votesPerCandidate(c1);
         
-        IVoting(childElection).gvpc(c2);
+        IVoting(childElection).votesPerCandidate(c2);
 
 
         IVoting(childElection).winnerName();
