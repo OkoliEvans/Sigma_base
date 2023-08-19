@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity 0.8.21;
+pragma solidity 0.8.17;
 
 import {Test, console2} from "forge-std/Test.sol";
 import "../src/contract/voting.sol";
@@ -42,8 +42,7 @@ contract CounterTest is Test {
         votingfactory.rc(10);
 
         vm.prank(user);
-        (bytes32 hsh) = IVoting(childElection).verify("A102567T");
-        // console2.log("hash2", hsh);
+        (bool rezt) = IVoting(childElection).verify("A102567T");
 
         vm.prank(user2);
         IVoting(childElection).verify("1014332777");
@@ -55,11 +54,11 @@ contract CounterTest is Test {
         IVoting(childElection).verify("10143327");
 
         vm.prank(user5);
-        IVoting(childElection).verify("10143327");
+        IVoting(childElection).verify("101433273565");
 
         vm.startPrank(overseer);
-        IVoting(childElection).addCandidate(1, 49, c1, "Festus", "Secretary", "A doctor by profession, trustworthy");
-        IVoting(childElection).addCandidate(1, 49, c2, "Olorun", "Secretary", "A lawyer by profession");
+        IVoting(childElection).addCandidate( 49, c1, "Festus", "Secretary", "A doctor by profession, trustworthy");
+        IVoting(childElection).addCandidate( 49, c2, "Olorun", "Secretary", "A lawyer by profession");
 
         IVoting(childElection).startVote(1692275459);
         vm.stopPrank();
@@ -78,6 +77,12 @@ contract CounterTest is Test {
 
         vm.prank(user5);
         IVoting(childElection).vote(c2);
+
+        IVoting(childElection).gtTotalVotes();
+
+        IVoting(childElection).gvpc(c1);
+        
+        IVoting(childElection).gvpc(c2);
 
 
         IVoting(childElection).winnerName();
