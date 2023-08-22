@@ -1,0 +1,21 @@
+{
+  "abi": [],
+  "bytecode": {
+    "object": "0x",
+    "linkReferences": {}
+  },
+  "deployedBytecode": {
+    "object": "0x",
+    "linkReferences": {}
+  },
+  "ast": {
+    "absolutePath": "test/voting.t.sol",
+    "id": 4131,
+    "exportedSymbols": {},
+    "nodeType": "SourceUnit",
+    "src": "1239:0:18",
+    "nodes": [],
+    "license": "UNLICENSED"
+  },
+  "id": 18
+}
