@@ -21,7 +21,7 @@ const Navbar = () => {
     <div className="w-full bg-[#FFFFFF] fixed top-0 left-0 z-30 p-4">
       <div className="md:flex items-center justify-between text-[#010101] text-sm font-medium">
         <Link href="/">
-          <h2 className="text-black text-3xl">Sigma.</h2>
+          <h2 className="text-[#010da4] text-3xl">Sigma.</h2>
         </Link>
         <div
           onClick={() => setOpen(!open)}
