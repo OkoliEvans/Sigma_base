@@ -8,7 +8,9 @@ An election overseer or administrator can create an election easily by simply pa
 i. An election id <br/>
 ii. Token name for vote tag <br/>
 iii. Token symbol <br/>
-iv. Date and time for start of election **in unix time** <br/>
+iv. Election title <br/>
+v. Date and time for start of election **in unix time** <br/>
+
 
 
 
