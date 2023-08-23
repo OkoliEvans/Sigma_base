@@ -5,10 +5,10 @@ Decentralized voting engine for creating and hosting elections. Anyone can creat
 ## Create election
 An election overseer or administrator can create an election easily by simply passing in the following: 
 
-i. An election id
-ii. Token name for vote tag
-iii. Token symbol
-iv. Date and time for start of election **in unix time**
+i. An election id <br/>
+ii. Token name for vote tag <br/>
+iii. Token symbol <br/>
+iv. Date and time for start of election **in unix time** <br/>
 
 
 
