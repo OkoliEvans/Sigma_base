@@ -47,6 +47,23 @@ Simply click on the particular election to open up the election page, then click
 
 **Voting**
 
+All verified voters for every election instance are eligible to vote in that election. On an election page, simply tap on **vote** button and then sign the transaction in your wallet. If the process is successful you'll see an update on the election display banner, after the transaction has been confirmed on chain, the number of votes for each candidate will be updated and the winner will be updated in real time.
+
+...and as a sourvenir you get a "voted" NFT minted to your wallet. This is simply a thank you token and also a proof of your involvement in the election. It is not transferable.
+
+
+## Automatic colleration
+
+Voting on Sigma is as open as daylight. Once a voter successfully casts a vote, the election core functions are invoked to update the leaderboard. It's safe to say that winner emerges in real time as the voting proceeds, and whoever is on top at the end becomes the winner of the contest. There's no need for personnels to count or collerate elections manually. 
+
+We will keep building and updating the algorithms of the system as we monitor how elections are being conducted and managed by the administrators. If the systems gets abused or if administrators starts playing shady games, we will implement features that will give more administrators power to oversee the process and make decisions based on a consensus.
+
+
+## Developers
+
+In the hallowed spirit of open source that is the tradition of web3 builders, the Sigma team is making this entire codebase open source. In the coming days, the folders housing both frontend and backend systems will be updated with the necessary tools, links and cli to successfully install, simulate and run the Sigma base locally.
+
+In the meantime, we welcome PRs or issues from everyone that will help to improve the system, we apreciate especially PRs that will pinpoint bugs in the smart contracts, and of course in the other code files :)
 
 
 
