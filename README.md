@@ -16,6 +16,16 @@ When the needed data are provided, a new voting instance is created for that ele
 **Next step**
 ## Add Candidates
 Only an election administrator or the overseer can add candidates. Candidates refer to the persons that will be contesting for positions in the election. These candidates will be displayed on that particular election instance where they are added.
+Each candidate will be displayed on the election page with the following params:
+i. age
+ii. wallet address
+iii. full name
+iv. position
+v. brief description of the person
+
+Candidates already added can be **disqualified** from contesting by calling the 'rmCandidate' function which is available as a button in the admin page.
+
+
 
 
 
