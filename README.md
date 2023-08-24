@@ -26,7 +26,11 @@ v. brief description of the person <br/>
 
 Candidates already added can be **disqualified** from contesting by calling the 'rmCandidate' function which is available as a button in the admin page.
 
+**Control election flow**
 
+
+
+## For Voters
 
 
 
