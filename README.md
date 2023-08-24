@@ -37,7 +37,12 @@ Candidates already added can be **disqualified** from contesting by calling the 
 
 The Sigma voting engine by design is built to resolve the problem of multiple registration by an individual, and by extension, multiple voting. The design thinking was to eliminate voting fraud totally, while keeping the entire process open, transparent and credible. We also plan to add features that will enable diaspora voting too. Voter **registration** on Sigma begins with verification.
 
-**verification**
+**verification** <br/>
+Verification on the platform begins as an offchain process that ensures that the voter seeking to get verified is truly a bonafide citizen of the country, club or group hosting the election. We plan to make the system robust that every administrator that set verification parameters and conditions, but the single verification system we have have works with mobile sms. For now we make do with this, while we wait for approval from the NCC ministry for access to endpoints for validation using BVN, NIN, Passport and Drivers license.
+
+**How to:** <br/>
+Simply click on the particular election to open up the election page, then click on the "verify" button. As you pass in your mobile number, you'll get an sms containing your verification Id. Enter the Id, then click on "enter", on the wallet modal that pops up select the wallet you have, then sign the verification message. This will get you verified onchain and you are eligible to vote in that election. 
+
 
 
 
