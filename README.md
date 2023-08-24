@@ -52,9 +52,9 @@ All verified voters for every election instance are eligible to vote in that ele
 ...and as a sourvenir you get a "voted" NFT minted to your wallet. This is simply a thank you token and also a proof of your involvement in the election. It is not transferable.
 
 
-## Automatic colleration
+## Automatic collation
 
-Voting on Sigma is as open as daylight. Once a voter successfully casts a vote, the election core functions are invoked to update the leaderboard. It's safe to say that winner emerges in real time as the voting proceeds, and whoever is on top at the end becomes the winner of the contest. There's no need for personnels to count or collerate elections manually. 
+Voting on Sigma is as open as daylight. Once a voter successfully casts a vote, the election core functions are invoked to update the leaderboard. It's safe to say that winner emerges in real time as the voting proceeds, and whoever is on top at the end becomes the winner of the contest. There's no need for personnels to count or collate elections manually. 
 
 We will keep building and updating the algorithms of the system as we monitor how elections are being conducted and managed by the administrators. If the systems gets abused or if administrators starts playing shady games, we will implement features that will give more administrators power to oversee the process and make decisions based on a consensus.
 
