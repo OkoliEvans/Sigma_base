@@ -11,6 +11,8 @@ iii. Token symbol <br/>
 iv. Election title <br/>
 v. Date and time for start of election **in unix time** <br/>
 
+When the needed data are provided, a new voting instance is created for that election. The details of the election are recorded and accessible. But no voting can hold just yet until the contesting candidates are added and the start election button clicked.
+
 
 
 
