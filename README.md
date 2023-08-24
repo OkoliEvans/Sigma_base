@@ -27,7 +27,9 @@ v. brief description of the person <br/>
 Candidates already added can be **disqualified** from contesting by calling the 'rmCandidate' function which is available as a button in the admin page.
 
 **Control election flow**
+**start vote:** This function kicks off the voting process. It is only after the administrator starts the process that verified voters can cast their votes. To start the process the administrator will need to pass the time when the voting will end. This is to enable the system to track the duration and capture moments during the voting process.
 
+**end vote:** This signals the end of the voting process. At the click of this button, no one can cast votes anymore, and the election is basically complete. Therefore this button is only available to the election administrator.
 
 
 ## For Voters
