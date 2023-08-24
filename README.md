@@ -14,7 +14,7 @@ v. Date and time for start of election **in unix time** <br/>
 When the needed data are provided, a new voting instance is created for that election. The details of the election are recorded and accessible. But no voting can hold just yet until the contesting candidates are added and the start election button clicked. The technical parts have been perfectly abstracted out for easy use of the newest web3 user.
 </br>
 </br>
-**Next steps**
+##*Next steps*
 
 ## Add Candidates
 Only an election administrator or the overseer can add candidates. Candidates refer to the persons that will be contesting for positions in the election. These candidates will be displayed on that particular election instance where they are added.
