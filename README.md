@@ -35,5 +35,10 @@ Candidates already added can be **disqualified** from contesting by calling the 
 
 ## For Voters
 
+The Sigma voting engine by design is built to resolve the problem of multiple registration by an individual, and by extension, multiple voting. The design thinking was to eliminate voting fraud totally, while keeping the entire process open, transparent and credible. We also plan to add features that will enable diaspora voting too. Voter **registration** on Sigma begins with verification.
+
+**verification**
+
+
 
 
