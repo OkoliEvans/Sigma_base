@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import VoteCard from "@/components/VoteCard";
+import axios from "axios";
 
-const votes = () => {
+export default function votes() {
   const [events, setEvents] = useState([]);
   const [visible, setVisible] = useState(6);
 
@@ -10,6 +11,30 @@ const votes = () => {
     setVisible((prevValue) => prevValue + 6);
   };
 
+  const [auth, setAuth] = useState(false);
+
+  const retrievecookies = () => {
+  axios.get('/api/votingcookieauthenticateAPI')
+  .then (res => {
+    if (res.status === 200) {
+      setAuth(true)
+    }
+    else {
+      console.log('Try again!')
+      setAuth(false)
+    }
+  })
+  .catch(err => {
+    console.log(err)
+    setAuth(false)
+  })
+  }
+ 
+  useEffect(() => {
+     retrievecookies();
+   }, []);
+
+   if (auth){
   return (
     <div className="flex flex-col items-center justify-center">
       <h2 className="mb-4 text-2xl font-semibold text-blue-950">Votes</h2>
@@ -26,6 +51,11 @@ const votes = () => {
       </div>
     </div>
   );
+   }
+   else {
+    return (
+        <div className='lg:text-[240%] md:text-[240%] text-[200%] p-[12%] font-[600] text-center text-[#b00] bg-[#224]'>You must be authenticated to access this page!!</div>
+    )
+  }
 };
 
-export default votes;

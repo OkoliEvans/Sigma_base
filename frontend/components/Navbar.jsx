@@ -7,7 +7,7 @@ import { useRouter } from "next/router";
 
 const Navbar = () => {
   let Anchors = [
-    { name: "Home", address: "/" },
+    { name: "Home", address: "/index2" },
     { name: "Votes", address: "/votes" },
     { name: "About", address: "/about" },
     { name: "Docs", address: "/docs" },
