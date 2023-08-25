@@ -46,6 +46,11 @@ const Update = () => {
       hash: createEventData?.hash,
 
       onSuccess: () => {
+        setid(0);
+        setEnftName("");
+        setENftSymbol("");
+        setContest("");
+        setRegStartDateAndTime(0);
         toast.success("Election successfully created");
       },
 
