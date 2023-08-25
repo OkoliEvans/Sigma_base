@@ -13,8 +13,8 @@ const Update = () => {
   const [id, setid] = useState(0);
   const [eNftName, setEnftName] = useState("");
   const [eNftSymbol, setENftSymbol] = useState("");
-  const [contest, setContest] = useState("");
   const [regStartDateAndTime, setRegStartDateAndTime] = useState(0);
+  const [contest, setContest] = useState("");
   const tokenuri = "QmU4xfVFWN3MjBu8T95vDv7482u5YPDCy1U4EMNK6Zyk2W";
 
     const { config: config1 } = usePrepareContractWrite({
@@ -117,12 +117,12 @@ const Update = () => {
 
         <br />
         <label>
-          Contest Name:
+          Election Title:
           <br />
           <input
             className="py-2 px-2 border border-blue-950 rounded-lg w-full mb-2"
             type="text"
-            placeholder="Event NFt sympol"
+            placeholder="e.g: Nigerian Presidential Election 2023"
             onChange={(e) => setContest(e.target.value)}
           />
         </label>
