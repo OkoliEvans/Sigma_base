@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { CountDownTimer } from "./CountDownTimer";
 import Link from "next/link";
 import Modal from "./Modal";
@@ -14,7 +14,7 @@ import { toast } from "react-toastify";
 const VoteCard = ({ electionAddress }) => {
   const [regDeadline, setRegDeadline] = useState(0);
   const [modal, setModal] = useState(false);
-  const [ verificationNo, setVerificationNo ] = useState(0);
+  const [ verificationNo, setVerificationNo ] = useState("");
   const [tel, setTel] = useState(0);
 
   const handleClose = () => {
@@ -46,7 +46,7 @@ const VoteCard = ({ electionAddress }) => {
     hash: verifyData?.hash,
 
     onSuccess: () => {
-      setVerificationNo(0);
+      setVerificationNo("");
       toast.success("Election successfully created");
     },
 
@@ -62,7 +62,7 @@ const VoteCard = ({ electionAddress }) => {
     }
 
     if (isSuccess) {
-     setVerificationNo(0);
+     setVerificationNo("");
     }
   }, [isError, isSuccess]);
 
