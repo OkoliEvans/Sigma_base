@@ -1,129 +1,79 @@
 import React, { useEffect, useState } from "react";
-// import {
-//   useContractWrite,
-//   usePrepareContractWrite,
-//   useWaitForTransaction,
-// } from "wagmi";
-// import ABI from "../utils/ABI/factoryAbi.json";
-// import contractAddress from "../utils/contractAddr";
-// import { toast } from "react-toastify";
+import {
+  useContractWrite,
+  usePrepareContractWrite,
+  useWaitForTransaction,
+} from "wagmi";
+import ABI from "../utils/ABI/factoryAbi.json";
+import contractAddress from "../utils/contractAddress/factoryAddress";
+import { toast } from "react-toastify";
 // import main from "../components/upload.mjs";
 
 const Update = () => {
-  const [participants, setParticipants] = useState(0);
+  const [id, setid] = useState(0);
   const [eNftName, setEnftName] = useState("");
   const [eNftSymbol, setENftSymbol] = useState("");
-  const [image, setImage] = useState("");
-  const [description, setDescription] = useState("");
-  const [eventFee, setEventFee] = useState("");
-  const [id, setid] = useState(0);
   const [regStartDateAndTime, setRegStartDateAndTime] = useState(0);
-  const [regDeadline, setRegDeadline] = useState(0);
-  const [eventUri, setEventUri] = useState("");
-  const [eventDetails, setEventDetails] = useState({});
-  const [tokenuri, setTokenUri] = useState("QmU4xfVFWN3MjBu8T95vDv7482u5YPDCy1U4EMNK6Zyk2W");
   const [contest, setContest] = useState("");
+  const tokenuri = "QmU4xfVFWN3MjBu8T95vDv7482u5YPDCy1U4EMNK6Zyk2W";
 
-  //   const { config: config1 } = usePrepareContractWrite({
-  //     address: contractAddress,
-  //     abi: ABI,
-  //     functionName: "createEvent",
-  //     args: [
-  //       id,
-  //       eventFee,
-  //       participants,
-  //       regStartDateAndTime,
-  //       regDeadline,
-  //       eventUri,
-  //       eNftName,
-  //       eNftSymbol,
-  //     ],
-  //   });
+    const { config: config1 } = usePrepareContractWrite({
+      address: contractAddress,
+      abi: ABI,
+      functionName: "createEvent",
+      args: [
+        id,
+        eNftName,
+        eNftSymbol,
+        tokenuri,
+        contest,
+        regStartDateAndTime,
+      ],
+    });
 
-  //   const {
-  //     data: createEventData,
-  //     isLoading: createEventIsLoading,
-  //     write: create,
-  //   } = useContractWrite(config1);
+    const {
+      data: createEventData,
+      isLoading: createEventIsLoading,
+      write: create,
+    } = useContractWrite(config1);
 
-  //   const {
-  //     data: createWaitData,
-  //     isLoading: createWaitIsLoading,
-  //     isError,
-  //     isSuccess,
-  //   } = useWaitForTransaction({
-  //     hash: createEventData?.hash,
+    const {
+      data: createWaitData,
+      isLoading: createWaitIsLoading,
+      isError,
+      isSuccess,
+    } = useWaitForTransaction({
+      hash: createEventData?.hash,
 
-  //     onSuccess: () => {
-  //       toast.success("Event successfully created");
-  //     },
+      onSuccess: () => {
+        toast.success("Election successfully created");
+      },
 
-  //     onError(error) {
-  //       toast.error("Encountered error: ", error);
-  //     },
-  //   });
+      onError(error) {
+        toast.error("Encountered error: ", error);
+      },
+    });
 
-  const handleNftCreation = () => {
-    console.log();
-  };
 
-  //   const handleNftCreation = async (e) => {
-  //     e.preventDefault();
-  //     const result = await main(
-  //       image,
-  //       eNftName,
-  //       eNftSymbol,
-  //       description,
-  //       eventFee,
-  //       participants,
-  //       regStartDateAndTime,
-  //       regDeadline,
-  //       id
-  //     );
-  //     console.log(result);
-  //     setEventDetails(result);
-  //     setid(result.data.id);
-  //     setEventFee(result.data.fee);
-  //     setParticipants(result.data.noOfParticipants);
-  //     setRegStartDateAndTime(result.data.regStartDateAndTime);
-  //     setRegDeadline(result.data.regDeadline);
-  //     setEventUri(result.ipnft);
-  //     setEnftName(result.data.name);
-  //     setENftSymbol(result.data.symbol);
+    const handleNftCreation = async (e) => {
+      e.preventDefault();
 
-  //     if (result) {
-  //       toast.success("Event details uploaded 100%...");
-  //     }
+      create?.();
+    };
 
-  //     if (create && typeof create === "function") {
-  //       try {
-  //         await create();
-  //       } catch (error) {
-  //         console.error("Error calling create function:", error);
-  //         // Handle the error appropriately, such as displaying an error message
-  //         toast.error("Failed to create event");
-  //       }
-  //     }
+    useEffect(() => {
+      if (isError) {
+        toast.error("Transaction error try again");
+      }
 
-  //     // create?.();
-  //   };
-
-  //   useEffect(() => {
-  //     if (isError) {
-  //       toast.error("Transaction error try again");
-  //     }
-
-  //     if (isSuccess) {
-  //       setid(0);
-  //       setEventFee(0);
-  //       setParticipants(0);
-  //       setRegStartDateAndTime(true);
-  //       setRegDeadline(true);
-  //       setEventUri("");
-  //       setEnftName("");
-  //       setENftSymbol("");
-  //     }
-  //   }, [isError, isSuccess]);
+      if (isSuccess) {
+        setid(0);
+        setEnftName("");
+        setENftSymbol("");
+        setContest("");
+        setRegStartDateAndTime(true);
+      }
+    }, [isError, isSuccess]);
 
   return (
     <div className="flex justify-center items-center">
@@ -160,18 +110,6 @@ const Update = () => {
           />
         </label>
 
-        {/* <br /> */}
-        {/* <label>
-          Token URI:
-          <br />
-          <input
-            className="py-2 px-2 border border-blue-950 rounded-lg w-full mb-2"
-            type="text"
-            placeholder="Election NFT Symbol"
-            onChange={(e) => setTokenUri(e.target.value)}
-          />
-        </label> */}
-
         <br />
         <label>
           Election Title:
@@ -201,16 +139,6 @@ const Update = () => {
           />
         </label>
 
-        {/* <br />
-        <label>
-          Event image:
-          <br />
-          <input
-            className="py-2 px-2 border border-blue-950 rounded-lg w-full mb-2"
-            type="file"
-            onChange={(e) => setImage(e.target.files[0])}
-          />
-        </label> */}
         <button
           className="py-2 outline-none mt-4 w-full hover:bg-blue-900 bg-blue-950 text-white font-semibold rounded-lg"
           type="submit"
