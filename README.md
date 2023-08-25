@@ -67,7 +67,7 @@ In the hallowed spirit of open source that is the tradition of web3 builders, th
 
 In the meantime, we welcome PRs or issues from everyone that will help to improve the system, we apreciate especially PRs that will pinpoint bugs in the smart contracts, and of course in the other codes as well :)
 
-
+*Factory Contract deployed on GoerliBase:* 0xaF528DF7F1B2528B7ec36a57C8ec0262B8256bFB
 
 
 
