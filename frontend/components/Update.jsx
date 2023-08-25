@@ -143,7 +143,7 @@ const Update = () => {
           className="py-2 outline-none mt-4 w-full hover:bg-blue-900 bg-blue-950 text-white font-semibold rounded-lg"
           type="submit"
         >
-          Upload Data
+          Create Election
         </button>
       </form>
     </div>
