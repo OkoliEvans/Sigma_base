@@ -4,8 +4,8 @@ import {
   usePrepareContractWrite,
   useWaitForTransaction,
 } from "wagmi";
-import ABI from "../utils/ABI/factoryAbi.json";
-import contractAddress from "../utils/contractAddress/factoryAddress";
+import ABI from "../Utils/ABI/factoryAbi.json";
+import contractAddress from "../Utils/contractAddress/factoryAddress";
 import { toast } from "react-toastify";
 // import main from "../components/upload.mjs";
 
@@ -20,7 +20,7 @@ const Update = () => {
     const { config: config1 } = usePrepareContractWrite({
       address: contractAddress,
       abi: ABI,
-      functionName: "createEvent",
+      functionName: "createElection",
       args: [
         id,
         eNftName,
