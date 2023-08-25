@@ -1,0 +1,134 @@
+[
+  { "inputs": [], "stateMutability": "nonpayable", "type": "constructor" },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "votingAddr",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "overseer",
+        "type": "address"
+      }
+    ],
+    "name": "CreateElection",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "Moderator",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "contestToID",
+    "outputs": [
+      { "internalType": "uint256", "name": "_voteID", "type": "uint256" },
+      { "internalType": "bool", "name": "_idRegd", "type": "bool" },
+      { "internalType": "address", "name": "_overseer", "type": "address" },
+      { "internalType": "address", "name": "_election", "type": "address" },
+      { "internalType": "string", "name": "_contest", "type": "string" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "voteId", "type": "uint256" },
+      { "internalType": "string", "name": "name_", "type": "string" },
+      { "internalType": "string", "name": "symbol_", "type": "string" },
+      { "internalType": "string", "name": "tokenUri", "type": "string" },
+      { "internalType": "string", "name": "_contest", "type": "string" },
+      { "internalType": "uint256", "name": "start", "type": "uint256" }
+    ],
+    "name": "createElection",
+    "outputs": [
+      { "internalType": "address", "name": "childElection", "type": "address" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "elections",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "nElections",
+    "outputs": [
+      { "internalType": "uint256", "name": "totalElections", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "voteId", "type": "uint256" }
+    ],
+    "name": "rc",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "uint256", "name": "_voteID", "type": "uint256" },
+          { "internalType": "bool", "name": "_idRegd", "type": "bool" },
+          { "internalType": "address", "name": "_overseer", "type": "address" },
+          { "internalType": "address", "name": "_election", "type": "address" },
+          { "internalType": "string", "name": "_contest", "type": "string" }
+        ],
+        "internalType": "struct votingFactory.Contest",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "newMod", "type": "address" }
+    ],
+    "name": "replcModerator",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "electionAddr", "type": "address" }
+    ],
+    "name": "retElectionID",
+    "outputs": [{ "internalType": "uint256", "name": "Id", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "retElections",
+    "outputs": [
+      { "internalType": "address[]", "name": "", "type": "address[]" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "to", "type": "address" },
+      { "internalType": "uint256", "name": "amount", "type": "uint256" }
+    ],
+    "name": "wthr",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  { "stateMutability": "payable", "type": "receive" }
+]
