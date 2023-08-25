@@ -2,25 +2,80 @@ import React, { useState } from "react";
 import { CountDownTimer } from "./CountDownTimer";
 import Link from "next/link";
 import Modal from "./Modal";
+import ABI from "../Utils/ABI/childABI.json";
+import {
+  useContractWrite,
+  usePrepareContractWrite,
+  useWaitForTransaction,
+} from "wagmi";
+import { toast } from "react-toastify";
 
-const VoteCard = ({ eventAddress }) => {
-  const [eventUri, setEventUri] = useState("");
+
+const VoteCard = ({ electionAddress }) => {
   const [regDeadline, setRegDeadline] = useState(0);
-  const [fee, setFee] = useState(0);
-  const [detail, setDetail] = useState({});
   const [modal, setModal] = useState(false);
-  const [tel, setTel] = useState();
+  const [ verificationNo, setVerificationNo ] = useState(0);
+  const [tel, setTel] = useState(0);
 
   const handleClose = () => {
     //alert('closing');
     setModal(false);
   };
 
+  const { config: config1 } = usePrepareContractWrite({
+    address: electionAddress,
+    abi: ABI,
+    functionName: "verify",
+    args: [ verificationNo ],
+  });
+
+
+  const {
+    data: verifyData,
+    isLoading: verifyIsLoading,
+    write: verify,
+  } = useContractWrite(config1);
+
+
+  const {
+    data: verifyWaitData,
+    isLoading: verifyWaitIsLoading,
+    isError,
+    isSuccess,
+  } = useWaitForTransaction({
+    hash: verifyData?.hash,
+
+    onSuccess: () => {
+      setVerificationNo(0);
+      toast.success("Election successfully created");
+    },
+
+    onError(error) {
+      toast.error("Encountered error: ", error);
+    },
+  });
+
+
+  useEffect(() => {
+    if (isError) {
+      toast.error("Transaction error try again");
+    }
+
+    if (isSuccess) {
+     setVerificationNo(0);
+    }
+  }, [isError, isSuccess]);
+
+
   const handleCancel = () => {
     setModal(false);
   };
 
-  const handleSubmit = () => {};
+  const handleSubmit = async(e) => {
+    e.preventDefault();
+
+    verify?.();
+  };
 
   return (
     <div className="relative bg-[#FFFFFF] p-4 rounded-lg shadow-lg w-5/6 h-full flex flex-col items-center justify-center">
