@@ -9,10 +9,10 @@ const Business = () => {
     <div className=" w-full shadow-lg rounded-2xl relative flex-col justify-center items-center bg-[#FFFFFF] py-12 md:px-16 px-4 mb-12">
       <div className="flex flex-col justify-center items-center w-[100%]">
         <h2 className="font-semibold text-[#080E26] text-4xl mb-5">
-          Create and mint your Election Tickets
+          Create Elections, Experience Credibility and Transparency.
         </h2>
         <p className="relative font-light text-blue-950 text-2xl mb-8">
-          Here are easy steps to create and mint your Event Tickets on Sigma
+          Here are easy steps to create your elections on Sigma
         </p>
       </div>
       <div className="flex md:flex-row flex-col justify-start items-center font-medium w-[100%]">
