@@ -55,7 +55,7 @@ const Update = () => {
     });
 
 
-    const handleNftCreation = async (e) => {
+    const handleElectionCreation = async (e) => {
       e.preventDefault();
 
       create?.();
@@ -71,13 +71,13 @@ const Update = () => {
         setEnftName("");
         setENftSymbol("");
         setContest("");
-        setRegStartDateAndTime(true);
+        setRegStartDateAndTime(0);
       }
     }, [isError, isSuccess]);
 
   return (
     <div className="flex justify-center items-center">
-      <form onSubmit={handleNftCreation} className="">
+      <form onSubmit={handleElectionCreation} className="">
         <label>
           Vote ID:
           <br />
