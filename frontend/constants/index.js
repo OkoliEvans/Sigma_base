@@ -43,30 +43,30 @@ export const business = [
   {
     id: 1,
     imageurl: "/wallet-2-256.png",
-    name: "Register your election",
+    name: "Create Election",
     description:
-      "Click on the 'Get started' button to submit your event details to the platform.",
+      "Click on the 'create election', pass in the required details in the form and sign the transaction on your wallet.",
   },
   {
     id: 2,
     imageurl: "/filled-box-256.png",
-    name: "Create your election",
+    name: "Add Candidates",
     description:
-      "Click on 'Create event' button, Enter the unique ID generated for you and hit Upload.",
+      "On the admin page for the election, click on 'add candidates' to add candidates that will be contesting for a position.",
   },
   {
     id: 3,
     imageurl: "/stack-of-photos-256.png",
-    name: "Get your election NFTs",
+    name: "Get  Verified",
     description:
-      "Click on a particular event, after the event page loads, click on 'Register' button.",
+      "Click on a particular election, after the page loads, click on the 'verify' button, then pass in the required details",
   },
   {
     id: 4,
     imageurl: "/tag-5-256.png",
-    name: "Claim attendance ticket",
+    name: "Vote",
     description:
-      "On an already registered event, click on 'Claim' button. Note that only users that attended the event can claim.",
+      "On an already hosted election on which you are verified, click on 'vote' button. Note that only users that are verified can vote.",
   },
 ];
 
