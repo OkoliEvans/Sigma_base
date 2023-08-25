@@ -74,23 +74,23 @@ export const feedback = [
   {
     id: "feedback-1",
     content:
-      "Finally, MetaSquare has puts control back in the hands of the users. With decentralized ticketing, I no longer worry about scalpers or fraud. It's a game-changer!",
+      "Finally, Sigma has puts control back in the hands of the people. With decentralized voting, I no longer worry about vote manipulation or fraud. It's a game-changer!",
     name: "Kramer",
-    title: "Tech CEO",
+    title: "Techly CEO",
   },
   {
     id: "feedback-2",
     content:
-      "This decentralized ticketing platform revolutionized my event experience. I could easily buy and sell tickets securely without any intermediaries. Highly recommended!",
+      "This decentralized voting platform revolutionized my voting experience. I could easily vote for my candidate of choice without going through the hassles of long travels and queues!",
     name: "John",
-    title: "Senior Engineer",
+    title: "Attorney",
   },
   {
     id: "feedback-3",
     content:
-      "I love how MetaSquare ensures fairness by preventing ticket hoarding and price manipulation. It's a win-win for both event-goers and organizers.",
+      "I love how Sigma ensures fairness by preventing voting manipulation. It's a win-win for everyone. Welcome, true democracy",
     name: "Adebayo",
-    title: "Lead Manager",
+    title: "Manager at RS Labs",
   },
 ];
 
