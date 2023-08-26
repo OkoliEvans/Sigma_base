@@ -12,8 +12,6 @@ const VoteCard = ({ electionAddress }) => {
   const [modal, setModal] = useState(false);
   const [tel, setTel] = useState();
 
-  endtime, contest, started(bool);
-
   const { data, isLoading, isError } = useContractRead({
     address: electionAddress,
     abi: childABI,
