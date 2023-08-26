@@ -2,14 +2,27 @@ import React, { useState } from "react";
 import { CountDownTimer } from "./CountDownTimer";
 import Link from "next/link";
 import Modal from "./Modal";
+import { useContractRead } from "wagmi";
+import childABI from "../Utils/ABI/childABI.json";
 
-const VoteCard = ({ eventAddress }) => {
-  const [eventUri, setEventUri] = useState("");
-  const [regDeadline, setRegDeadline] = useState(0);
-  const [fee, setFee] = useState(0);
+const VoteCard = ({ electionAddress }) => {
+  const [voteDeadline, setVoteDeadline] = useState(0);
+  const [voteStart, setVoteStart] = useState(false);
   const [detail, setDetail] = useState({});
   const [modal, setModal] = useState(false);
   const [tel, setTel] = useState();
+
+  endtime, contest, started(bool);
+
+  const { data, isLoading, isError } = useContractRead({
+    address: electionAddress,
+    abi: childABI,
+    functionName: "displayElection",
+    onSuccess(data) {
+      //console.log(data);
+      handleEventData(data);
+    },
+  });
 
   const handleClose = () => {
     //alert('closing');
