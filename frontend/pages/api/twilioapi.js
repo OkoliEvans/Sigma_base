@@ -15,9 +15,9 @@ export default async function handler(req, res) {
         from: process.env.TWILIO_PHONE_NUMBER,
         to: `${phone}`,
       });
-      alert(`Your OTP is ${OTP}`)
       res.status(200).json({ message: 'Message sent successfully' });
       console.log( country, state, lga, first_name, last_name, phone, OTP );
+
     } catch (error) {
       console.error("Twilio API Error:", error);
       res.status(500).json({ error: 'An error occurred while sending the message' });
