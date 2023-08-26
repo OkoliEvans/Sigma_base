@@ -42,7 +42,7 @@ const sendDetailsToTwilioAPIandCheckDatabaseandWritetoDatabase =  async (e) => {
   .then ((res) => {
     if (res.status === 200) {
       console.log(res)
-      alert("Your OTP is" + values.OTP)
+      alert("Your OTP is " + values.OTP)
       router.push('/votingverifypage')
     } 
     else {
