@@ -23,20 +23,6 @@ const router = useRouter();
 const sendDetailsToTwilioAPIandCheckDatabaseandWritetoDatabase =  async (e) => {
   setLoading(true);
   e.preventDefault();
-  if (values.phone.length === 14){
-  await axios.post('/api/sendvoterinfoapi', values)
-  .then ((res) => {
-    if (res.status === 200) {
-      console.log(res)
-      router.push('/votingverifypage')
-    } 
-    else {
-   console.log('Try again!')
-    }
-  })
-  .catch((err) => {
-    console.log(err)
-  })
 
   await axios.post('/api/twilioapi', values)
   .then ((res) => {
@@ -50,6 +36,23 @@ const sendDetailsToTwilioAPIandCheckDatabaseandWritetoDatabase =  async (e) => {
   .catch((err) => {
     console.log(err)
   })
+
+  if (values.phone.length === 14){
+  await axios.post('/api/sendvoterinfoapi', values)
+  .then ((res) => {
+    if (res.status === 200) {
+      console.log(res)
+      alert("Your OTP is" + values.OTP)
+      router.push('/votingverifypage')
+    } 
+    else {
+   console.log('Try again!')
+    }
+  })
+  .catch((err) => {
+    console.log(err)
+  })
+
 
 .finally(() => {
   setLoading(false); // Request completed (whether successful or not), stop loading
