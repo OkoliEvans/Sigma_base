@@ -9,3 +9,35 @@ body {
   box-sizing: border-box;
   font-family: "Space Grotesk", sans-serif;
 }
+
+.custom-loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 9999; /* Ensure the loader appears on top of everything */
+}
+
+.loader-spinner {
+  border: 4px solid rgba(19, 52, 197, 0.3);
+  border-top: 4px solid #ffffff;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.thefieldset{transition: 1s ease-in-out;}
+.thefieldset:hover{transform: scale3d(1.03, 1.03, 1.03); background-image: linear-gradient(180deg, #fff, #eee, #226);}
+.indexsubmitbutton{transition: 1s ease-in-out;}
+.indexsubmitbutton:hover{background-color: #226; text: #fff}

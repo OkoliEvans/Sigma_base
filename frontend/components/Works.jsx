@@ -22,13 +22,14 @@ const Works = () => (
       </h2>
       <p className="font-rubik font-normal text-[#080E26] text-[18px] leading-[30.8px]max-w-[470px] mt-5">
         This platform leverages blockchain technology to transform the
-        traditional voting system. It operates on a decentralized transparent network
-        where countries and organizations can create and hold elections in a transparent way,
-        eliminating the problem of fraud and manipulations.
+        traditional ticketing industry. It operates on a peer-to-peer network
+        where event organizers can directly sell tickets to customers,
+        eliminating the need for intermediaries.
       </p>
 
       <p className="font-poppins font-normal text-[#080E26] text-[18px] leading-[30.8px] max-w-[470px] mt-5">
-        It also reduces cost, promotes diaspora voting and eliminates election violence.
+        It also reduces ticket scalping, as the platform can enforce fair
+        pricing and prevent excessive reselling.
       </p>
     </div>
   </section>

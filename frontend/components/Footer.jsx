@@ -44,7 +44,7 @@ const Footer = () => {
 
       <div className="w-full rounded-xl flex h-full justify-between items-center md:flex-row flex-col p-6 bg-[#080E26] ">
         <p className="font-poppins font-normal text-[18px] text-center text-[#FFFFFF] leading-[27px]">
-          Copyright Ⓒ 2023 Metasquare. All Rights Reserved.
+          Copyright Ⓒ 2023 Sigma. All Rights Reserved.
         </p>
 
         <div className="flex flex-row md:mt-0 mt-6">
