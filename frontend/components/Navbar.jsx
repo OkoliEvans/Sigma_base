@@ -10,8 +10,7 @@ const Navbar = () => {
     { name: "Home", address: "/index2" },
     { name: "Votes", address: "/votes" },
     { name: "About", address: "/about" },
-    { name: "Docs", address: "/docs" },
-    { name: "Live Crypto Prices", address: "/livecryptopricespage" },
+    { name: "Docs", address: "/docs" }
   ];
 
   const router = useRouter();
