@@ -98,25 +98,17 @@ export const footerLinks = [
   {
     title: "Useful Links",
     links: [
-      {
-        name: "Admin",
-        link: "./createid",
-      },
-      {
-        name: "Set Voters",
-        link: "https://www.web3bridge.com/",
-      },
-      {
+        {
         name: "How it Works",
-        link: "https://www.web3bridge.com/",
+        link: "#",
       },
       {
         name: "Explore",
-        link: "https://www.web3bridge.com/",
+        link: "#",
       },
       {
         name: "Terms & Services",
-        link: "https://www.web3bridge.com/",
+        link: "#",
       },
     ],
   },
@@ -169,7 +161,7 @@ export const socialMedia = [
   {
     id: "social-media-2",
     icon: "/facebook.svg",
-    link: "https://facebook.com/profile.php?id=100092571884723",
+    link: "https://facebook.com/",
   },
   {
     id: "social-media-3",
