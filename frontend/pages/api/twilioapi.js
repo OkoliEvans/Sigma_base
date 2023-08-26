@@ -9,7 +9,7 @@ export default async function handler(req, res) {
       const client = twilio(accountSid, authToken);
        
         await client.messages.create({
-        body:`Hi ${first_name} ${last_name}! You are welcome to the INEC Nigeria portal. Your state is ${state} state and your Local Government Area is ${lga}. 
+        body:`Hi ${first_name} ${last_name}! You are welcome to the Sigma Nigeria portal. Your state is ${state} state and your Local Government Area is ${lga}. 
         Kindly input the OTP code received to proceed to the next step to vote for your preferred candidate. 
         Your OTP code is ${OTP}`,
         from: process.env.TWILIO_PHONE_NUMBER,

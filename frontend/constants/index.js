@@ -74,7 +74,7 @@ export const feedback = [
   {
     id: "feedback-1",
     content:
-      "Finally, MetaSquare has puts control back in the hands of the users. With decentralized ticketing, I no longer worry about scalpers or fraud. It's a game-changer!",
+      "Finally, Sigma has puts control back in the hands of the users. With decentralized ticketing, I no longer worry about scalpers or fraud. It's a game-changer!",
     name: "Kramer",
     title: "Tech CEO",
   },
@@ -88,7 +88,7 @@ export const feedback = [
   {
     id: "feedback-3",
     content:
-      "I love how MetaSquare ensures fairness by preventing ticket hoarding and price manipulation. It's a win-win for both event-goers and organizers.",
+      "I love how Sigma ensures fairness by preventing ticket hoarding and price manipulation. It's a win-win for both event-goers and organizers.",
     name: "Adebayo",
     title: "Lead Manager",
   },

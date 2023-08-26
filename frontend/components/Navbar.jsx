@@ -11,6 +11,7 @@ const Navbar = () => {
     { name: "Votes", address: "/votes" },
     { name: "About", address: "/about" },
     { name: "Docs", address: "/docs" },
+    { name: "Live Crypto Prices", address: "/livecryptopricespage" },
   ];
 
   const router = useRouter();
